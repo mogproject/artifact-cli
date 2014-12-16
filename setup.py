@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='artima',
-    version='0.0.1-SNAPSHOT',
+    name='artifact-cli',
+    version='0.0.1',
     description='Private Artifact Manager using Amazon S3',
     author='mogproject',
     author_email='mogproj@gmail.com',
@@ -14,6 +14,7 @@ setup(
         'boto',
     ],
     tests_require=[
+        'moto',
     ],
     package_dir={'': 'src'},
     packages=find_packages('src'),
@@ -21,6 +22,6 @@ setup(
     test_suite='tests',
     entry_points="""
     [console_scripts]
-    artima = artima.artima:main
+    art = artifactcli.artifactcli:main
     """,
 )
