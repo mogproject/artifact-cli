@@ -35,7 +35,7 @@ pip install git+https://github.com/mogproject/artifact-cli
 ```
 
 
-### Quckstart Guide
+### Quickstart Guide
 
 #### 1. Create your Amazon Web Services account (if need)
 
