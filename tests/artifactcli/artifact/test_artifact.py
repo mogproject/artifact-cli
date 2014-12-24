@@ -22,6 +22,7 @@ class TestArtifactInfo(unittest.TestCase):
         self.test_data = [
             Artifact(self.test_bi[0], self.test_fi[0], self.test_si[0]),
             Artifact(self.test_bi[1], self.test_fi[1], self.test_si[1]),
+            Artifact(self.test_bi[0], self.test_fi[0], None),
         ]
 
     def test_eq(self):
@@ -79,3 +80,4 @@ class TestArtifactInfo(unittest.TestCase):
     def test_dict_conversions(self):
         self.assertEqual(Artifact.from_dict(self.test_data[0].to_dict()), self.test_data[0])
         self.assertEqual(Artifact.from_dict(self.test_data[1].to_dict()), self.test_data[1])
+        self.assertEqual(Artifact.from_dict(self.test_data[2].to_dict()), self.test_data[2])

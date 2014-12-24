@@ -57,6 +57,10 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 4),
+                     FileInfo('host1', 'user1', 44444, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     None),
         ]
         self.maxDiff = None
 
@@ -256,6 +260,7 @@ class TestRepository(unittest.TestCase):
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[8])
         fp = StringIO()
         r.print_list('com.github.mogproject', fp=fp)
         self.assertEqual(fp.getvalue(), '\n'.join([
@@ -264,6 +269,7 @@ class TestRepository(unittest.TestCase):
             'art-test-0.0.1.jar   1   4.4MiB    2014-12-31 09:12:34   release 0.0.1   first commit   ',
             'art-test-0.0.1.jar   2   21.7KiB   2014-12-31 09:12:34   release 0.0.1   second commit  ',
             'art-test-0.0.1.jar   3   32.6KiB   2014-12-31 09:12:34   release 0.0.1   third commit   ',
+            'art-test-0.0.1.jar   4   43.4KiB   2014-12-31 09:12:34                                  ',
             'art-test-0.0.2.jar   1   4.4MiB    2014-12-31 09:12:34   release 0.0.2   new version    ']) + '\n')
         fp.close()
 

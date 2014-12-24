@@ -24,7 +24,7 @@ class GitInfo(BaseInfo):
         buf = [
             'Git Info:',
             '  Branch             : %s' % self.branch,
-            '  Tags               : %s' % self.tags,
+            '  Tags               : %s' % ', '.join(self.tags),
             '  Last Commit Author : %s <%s>' % (self.author_name, self.author_email),
             '  Last Commit Date   : %s' % self.committed_date,
             '  Last Commit Summary: %s' % self.summary,

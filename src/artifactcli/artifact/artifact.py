@@ -14,18 +14,22 @@ class Artifact(BaseInfo):
         self.scm_info = scm_info
 
     def __str__(self):
-        return '\n'.join([
+        ret = [
             '%s' % self.basic_info,
             '%s' % self.file_info,
-            '%s' % self.scm_info
-        ])
+        ]
+        if self.scm_info:
+            ret.append('%s' % self.scm_info)
+        return '\n'.join(ret)
 
     def to_dict(self):
-        return {
+        ret = {
             'basic_info': self.basic_info.to_dict(),
             'file_info': self.file_info.to_dict(),
-            'scm_info': self.scm_info.to_dict(),
         }
+        if self.scm_info:
+            ret.update({'scm_info': self.scm_info.to_dict()})
+        return ret
 
     @staticmethod
     def from_dict(d):

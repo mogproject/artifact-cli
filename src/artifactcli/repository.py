@@ -110,8 +110,8 @@ class Repository(CaseClass):
                     x.basic_info.revision,
                     x.file_info.size_format(),
                     x.file_info.mtime,
-                    ','.join(x.scm_info.tags),
-                    x.scm_info.summary,
+                    ','.join(x.scm_info.tags) if x.scm_info else '',
+                    x.scm_info.summary if x.scm_info else '',
                 ] for x in arts]
             column_len = [max([len(str(x)) + 2 for x in xs]) for xs in zip(*([headers] + values))]
             header_line = ' '.join(s.ljust(column_len[i]) for i, s in enumerate(headers)) + '\n'
