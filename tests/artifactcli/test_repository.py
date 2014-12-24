@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import unittest
 from datetime import datetime
 from StringIO import StringIO
@@ -61,6 +63,12 @@ class TestRepository(unittest.TestCase):
                      FileInfo('host1', 'user1', 44444, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
                      None),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 127),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], u'あいう', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), u'かきく',
+                             '111122223333444455556666777788889999aaaa')),
         ]
         self.maxDiff = None
 

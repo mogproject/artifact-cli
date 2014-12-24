@@ -18,7 +18,7 @@ class Repository(CaseClass):
         :return: None
         """
         s = self.driver.read_index()
-        xs = json.loads(s) if s else []
+        xs = json.loads(s, encoding='utf-8') if s else []
         self.artifacts = [Artifact.from_dict(x) for x in xs]
 
     def save(self):
@@ -27,7 +27,7 @@ class Repository(CaseClass):
         :return: None
         """
         xs = [x.to_dict() for x in self.artifacts]
-        s = json.dumps(xs)
+        s = json.dumps(xs, ensure_ascii=False)
         self.driver.write_index(s)
 
     def upload(self, group_id, local_path, artifact=None, force=False, print_only=False):
@@ -107,19 +107,19 @@ class Repository(CaseClass):
             values = [
                 [
                     '%s-%s.%s' % (x.basic_info.artifact_id, x.basic_info.version, x.basic_info.packaging),
-                    x.basic_info.revision,
+                    '%s' % x.basic_info.revision,
                     x.file_info.size_format(),
-                    x.file_info.mtime,
+                    '%s' % x.file_info.mtime,
                     ','.join(x.scm_info.tags) if x.scm_info else '',
                     x.scm_info.summary if x.scm_info else '',
                 ] for x in arts]
-            column_len = [max([len(str(x)) + 2 for x in xs]) for xs in zip(*([headers] + values))]
-            header_line = ' '.join(s.ljust(column_len[i]) for i, s in enumerate(headers)) + '\n'
+            column_len = [max([self._unicode_width(x) + 2 for x in xs]) for xs in zip(*([headers] + values))]
+            header_line = ' '.join(self._unicode_ljust(s, column_len[i]) for i, s in enumerate(headers)) + '\n'
             fp.writelines([header_line, '-' * len(header_line) + '\n'])
             for v in sorted(values):
-                fp.write(' '.join(str(s).ljust(column_len[i]) for i, s in enumerate(v)) + '\n')
+                self._write_safe(fp, ' '.join(self._unicode_ljust(s, column_len[i]) for i, s in enumerate(v)) + '\n')
         elif output == 'json':
-            fp.write(json.dumps([x.to_dict() for x in arts]) + '\n')
+            self._write_safe(fp, json.dumps([x.to_dict() for x in arts]) + '\n')
         else:
             raise ValueError('Unknown output format: %s' % output)
 
@@ -128,11 +128,12 @@ class Repository(CaseClass):
         art = self._get_artifact_from_path(group_id, file_name, revision)
 
         if output == 'text':
-            fp.write('%s\n' % art)
+            s = '%s\n' % art
         elif output == 'json':
-            fp.write(json.dumps(art.to_dict()) + '\n')
+            s = json.dumps(art.to_dict(), ensure_ascii=False) + '\n'
         else:
             raise ValueError('Unknown output format: %s' % output)
+        self._write_safe(fp, s)
 
     def _get_artifact_from_path(self, group_id, path, revision=None):
         bi = BasicInfo.from_path(group_id, path)
@@ -169,3 +170,24 @@ class Repository(CaseClass):
     def _get_latest_artifact(self, group_id, artifact_id, version, packaging):
         ret = self._get_artifacts(group_id, artifact_id, version, packaging)
         return [max(ret, key=lambda x: x.basic_info.revision)] if ret else []
+
+    @classmethod
+    def _unicode_width(cls, s):
+        from unicodedata import east_asian_width
+
+        width = {'F': 2, 'H': 1, 'W': 2, 'Na': 1, 'A': 2, 'N': 1}
+
+        if not isinstance(s, unicode):
+            s = unicode(s, 'utf-8')
+        return sum(width[east_asian_width(c)] for c in s)
+
+    @classmethod
+    def _unicode_ljust(cls, s, len, ch=' '):
+        x = max(0, len - cls._unicode_width(s))
+        return s + ch * x
+
+    @classmethod
+    def _write_safe(cls, fp, s):
+        if isinstance(s, unicode):
+            s = s.encode('utf-8')
+        fp.write(s)

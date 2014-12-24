@@ -2,6 +2,7 @@ import logging
 import boto
 from boto.s3.key import Key
 from basedriver import BaseDriver
+from artifactcli.util import assert_type
 
 DEFAULT_INDEX_NAME = 'artifact-cli-index.json'
 
@@ -31,27 +32,28 @@ class S3Driver(BaseDriver):
     def read_index(self):
         """
         Read index data from S3 bucket.
-        :return: index data as string
+        :return: index json text in unicode
         """
         logging.info('Reading index: %s' % self.s3_url(self.bucket_name, self.index_path))
         k = self.bucket().get_key(self.index_path)
         if k:
-            s = k.get_contents_as_string()
+            s = k.get_contents_as_string(encoding='utf-8')
         else:
-            s = ''
-        return s
+            s = u''
+
+        return assert_type(s, unicode)
 
     def write_index(self, s):
         """
         Write index data to S3 bucket.
-        :param s: index data in string
+        :param s: index json text in unicode
         :return: None
         """
         logging.info('Writing index: %s' % self.s3_url(self.bucket_name, self.index_path))
         k = Key(self.bucket())
         k.key = self.index_path
-        k.set_metadata('Content-Type', 'application/json')
-        k.set_contents_from_string(s)
+        k.set_metadata('Content-Type', 'application/json; charset=utf-8')
+        k.set_contents_from_string(s.encode('utf-8'))
 
     def upload(self, local_path, remote_path, md5):
         """

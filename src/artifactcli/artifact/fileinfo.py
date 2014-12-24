@@ -5,6 +5,7 @@ import getpass
 from datetime import datetime
 import dateutil.parser
 from baseinfo import BaseInfo
+from artifactcli.util import assert_type
 
 
 class FileInfo(BaseInfo):
@@ -20,13 +21,13 @@ class FileInfo(BaseInfo):
 
     def __str__(self):
         buf = [
-            'File Info:',
-            '  User    : %s@%s' % (self.user, self.host),
-            '  Modified: %s' % self.mtime,
-            '  Size    : %s (%s)' % (self.size, self.size_format()),
-            '  MD5     : %s' % self.md5,
+            u'File Info:',
+            u'  User    : %s@%s' % (self.user, self.host),
+            u'  Modified: %s' % self.mtime,
+            u'  Size    : %s (%s)' % (self.size, self.size_format()),
+            u'  MD5     : %s' % self.md5,
         ]
-        return '\n'.join(buf)
+        return assert_type(u'\n'.join(buf).encode('utf-8'), str)
 
     def to_dict(self):
         return {

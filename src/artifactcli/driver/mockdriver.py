@@ -8,15 +8,22 @@ class MockDriver(BaseDriver):
     """
     def __init__(self):
         super(MockDriver, self).__init__(['index_data', 'uploaded_data', 'downloaded_data'])
-        self.index_data = ""
+        self.index_data = ''
         self.uploaded_data = {}
         self.downloaded_data = {}
 
     def read_index(self):
-        return self.index_data
+        """
+        :return: index json text in unicode
+        """
+        return self.index_data.decode('utf-8')
 
     def write_index(self, s):
-        self.index_data = s
+        """
+        :param s: index json text in unicode
+        :return:
+        """
+        self.index_data = s.encode('utf-8')
 
     def upload(self, local_path, remote_path, md5):
         if md5 is None:

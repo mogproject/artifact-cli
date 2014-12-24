@@ -48,6 +48,9 @@ class TestGitInfo(unittest.TestCase):
         self.assertTrue(self.test_data[0] != GitInfo('master', [], 'AUTHOR', 'x@example.com',
                                                      datetime(2014, 12, 31, 12, 34, 56), 'COMMIT MSG', 'fffe'))
 
+    def test_str_type(self):
+        self.assertTrue(all(isinstance(x.__str__(), str) for x in self.test_data))
+
     def test_repr(self):
         self.assertEqual(repr(self.test_data[0]),
                          "GitInfo(branch='master', tags=[], author_name='AUTHOR', author_email='x@example.com', " +

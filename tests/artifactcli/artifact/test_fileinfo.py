@@ -28,6 +28,9 @@ class TestFileInfo(unittest.TestCase):
         self.assertTrue(self.test_data[0] != FileInfo('HOST', 'USER', 0, datetime(2014, 12, 31, 12, 34, 56, 1), '0'))
         self.assertTrue(self.test_data[0] != FileInfo('HOST', 'USER', 0, datetime(2014, 12, 31, 12, 34, 56, 1), '1'))
 
+    def test_str_type(self):
+        self.assertTrue(all(isinstance(x.__str__(), str) for x in self.test_data))
+
     def test_str(self):
         expected = [
             'File Info:\n  User    : USER@HOST\n  Modified: 2014-12-31 12:34:56\n  Size    : 0 (0.0B)\n  MD5     : 0',

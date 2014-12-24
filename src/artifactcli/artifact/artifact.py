@@ -2,6 +2,7 @@ from baseinfo import BaseInfo
 from basicinfo import BasicInfo
 from fileinfo import FileInfo
 from gitinfo import GitInfo
+from artifactcli.util import assert_type
 
 
 class Artifact(BaseInfo):
@@ -19,8 +20,8 @@ class Artifact(BaseInfo):
             '%s' % self.file_info,
         ]
         if self.scm_info:
-            ret.append('%s' % self.scm_info)
-        return '\n'.join(ret)
+            ret.append(self.scm_info.__str__())
+        return assert_type('\n'.join(ret), str)
 
     def to_dict(self):
         ret = {

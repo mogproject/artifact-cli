@@ -61,6 +61,9 @@ class TestBasicInfo(unittest.TestCase):
             BasicInfo('com.github.mogproject', 'xxx-yyy-assembly', '0.1-SNAPSHOT', 'jar', 123) !=
             BasicInfo('com.github.mogproject', 'xxx-yyy-assembly', '0.1-SNAPSHOTX', 'jar', 123))
 
+    def test_str_type(self):
+        self.assertTrue(all(isinstance(x.__str__(), str) for x in self.test_data))
+
     def test_repr(self):
         self.assertEqual(
             repr(self.test_data[0]),
