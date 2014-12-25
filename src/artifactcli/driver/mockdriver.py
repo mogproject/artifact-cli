@@ -1,5 +1,6 @@
 import logging
 from basedriver import BaseDriver
+from artifactcli.util import assert_type
 
 
 class MockDriver(BaseDriver):
@@ -8,7 +9,7 @@ class MockDriver(BaseDriver):
     """
     def __init__(self):
         super(MockDriver, self).__init__(['index_data', 'uploaded_data', 'downloaded_data'])
-        self.index_data = ''
+        self.index_data = u''
         self.uploaded_data = {}
         self.downloaded_data = {}
 
@@ -16,13 +17,14 @@ class MockDriver(BaseDriver):
         """
         :return: index json text in unicode
         """
-        return self.index_data.decode('utf-8')
+        return assert_type(self.index_data.decode('utf-8'), unicode)
 
     def write_index(self, s):
         """
         :param s: index json text in unicode
-        :return:
+        :return: None
         """
+        assert_type(s, unicode)
         self.index_data = s.encode('utf-8')
 
     def upload(self, local_path, remote_path, md5):

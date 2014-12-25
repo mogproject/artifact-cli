@@ -273,7 +273,7 @@ class TestRepository(unittest.TestCase):
         r.print_list('com.github.mogproject', fp=fp)
         self.assertEqual(fp.getvalue(), '\n'.join([
             'FILE                 #   SIZE      BUILD                 TAGS            SUMMARY        ',
-            '-----------------------------------------------------------------------------------------',
+            '----------------------------------------------------------------------------------------',
             'art-test-0.0.1.jar   1   4.4MiB    2014-12-31 09:12:34   release 0.0.1   first commit   ',
             'art-test-0.0.1.jar   2   21.7KiB   2014-12-31 09:12:34   release 0.0.1   second commit  ',
             'art-test-0.0.1.jar   3   32.6KiB   2014-12-31 09:12:34   release 0.0.1   third commit   ',
