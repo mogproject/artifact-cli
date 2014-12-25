@@ -1,5 +1,12 @@
 class CaseClass(object):
+    """
+    Implementation like Scala's case class
+    """
+
     def __init__(self, keys):
+        """
+        :param keys: list of attribute names
+        """
         self.__keys = keys
 
     def __eq__(self, other):

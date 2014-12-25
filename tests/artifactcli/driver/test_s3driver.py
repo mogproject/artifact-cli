@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import unittest
 import os
 import boto
@@ -10,17 +12,30 @@ class TestS3Driver(unittest.TestCase):
         self.tmp_path = 'tests/resources/test-artifact-1.2.3.dat.tmp'
 
     @mock_s3
-    def test_write_index_and_read_index(self):
+    def test_write_index(self):
         boto.connect_s3('XXX', 'YYY').create_bucket('bucket4art')
         d = S3Driver('XXX', 'YYY', 'bucket4art', 'gid')
-        d.write_index('[{json: "message"}]')
+        d.write_index(u'[{json: "message"}]')
+
+    @mock_s3
+    def test_write_index_unicode(self):
+        boto.connect_s3('XXX', 'YYY').create_bucket('bucket4art')
+        d = S3Driver('XXX', 'YYY', 'bucket4art', 'gid')
+        d.write_index(u'[{json: "メッセージ"}]')
 
     @mock_s3
     def test_read_index(self):
         boto.connect_s3('XXX', 'YYY').create_bucket('bucket4art')
         d = S3Driver('XXX', 'YYY', 'bucket4art', 'gid')
-        d.write_index('[{json: "message"}]')
-        self.assertEqual(d.read_index(), '[{json: "message"}]')
+        d.write_index(u'[{json: "message"}]')
+        self.assertEqual(d.read_index(), u'[{json: "message"}]')
+
+    @mock_s3
+    def test_read_index_unicode(self):
+        boto.connect_s3('XXX', 'YYY').create_bucket('bucket4art')
+        d = S3Driver('XXX', 'YYY', 'bucket4art', 'gid')
+        d.write_index(u'[{json: "メッセージ"}]')
+        self.assertEqual(d.read_index(), u'[{json: "メッセージ"}]')
 
     @mock_s3
     def test_read_index_not_found(self):

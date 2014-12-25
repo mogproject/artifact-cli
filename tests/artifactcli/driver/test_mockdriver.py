@@ -14,7 +14,7 @@ class TestMockDriver(unittest.TestCase):
 
     def test_write_index(self):
         # write some index data then read it
-        s = 'index1\nindex2\nindex3'
+        s = u'index1\nindex2\nindex3'
         m = MockDriver()
         m.write_index(s)
         self.assertEqual(m.read_index(), s)

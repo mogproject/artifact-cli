@@ -32,6 +32,7 @@ class S3Driver(BaseDriver):
     def read_index(self):
         """
         Read index data from S3 bucket.
+
         :return: index json text in unicode
         """
         logging.info('Reading index: %s' % self.s3_url(self.bucket_name, self.index_path))
@@ -46,9 +47,12 @@ class S3Driver(BaseDriver):
     def write_index(self, s):
         """
         Write index data to S3 bucket.
+
         :param s: index json text in unicode
         :return: None
         """
+        assert_type(s, unicode)
+
         logging.info('Writing index: %s' % self.s3_url(self.bucket_name, self.index_path))
         k = Key(self.bucket())
         k.key = self.index_path
@@ -76,6 +80,7 @@ class S3Driver(BaseDriver):
     def download(self, remote_path, local_path, md5):
         """
         Download file from S3 bucket.
+
         :param remote_path: S3 path to download
         :param local_path: local destination path
         :param md5: MD5 digest hex string to verify

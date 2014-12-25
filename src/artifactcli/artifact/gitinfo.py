@@ -4,7 +4,7 @@ import logging
 import dateutil.parser
 import git
 from baseinfo import BaseInfo
-from artifactcli.util import assert_type
+from artifactcli.util import *
 
 
 class GitInfo(BaseInfo):
@@ -23,15 +23,15 @@ class GitInfo(BaseInfo):
 
     def __str__(self):
         buf = [
-            u'Git Info:',
-            u'  Branch             : %s' % self.branch,
-            u'  Tags               : %s' % ', '.join(self.tags),
-            u'  Last Commit Author : %s <%s>' % (self.author_name, self.author_email),
-            u'  Last Commit Date   : %s' % self.committed_date,
-            u'  Last Commit Summary: %s' % self.summary,
-            u'  Last Commit SHA    : %s' % self.sha,
+            'Git Info:',
+            '  Branch             : %s' % self.branch,
+            '  Tags               : %s' % ', '.join(self.tags),
+            '  Last Commit Author : %s <%s>' % (self.author_name, self.author_email),
+            '  Last Commit Date   : %s' % self.committed_date,
+            '  Last Commit Summary: %s' % self.summary,
+            '  Last Commit SHA    : %s' % self.sha,
         ]
-        return assert_type(u'\n'.join(buf).encode('utf-8'), str)
+        return to_str('\n'.join(buf))
 
     def to_dict(self):
         return {

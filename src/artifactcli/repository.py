@@ -3,7 +3,7 @@ import logging
 import sys
 from copy import deepcopy
 from artifact import Artifact, BasicInfo
-from util import CaseClass
+from util import *
 
 
 class Repository(CaseClass):
@@ -15,6 +15,7 @@ class Repository(CaseClass):
     def load(self):
         """
         Load artifacts index from storage
+
         :return: None
         """
         s = self.driver.read_index()
@@ -24,15 +25,17 @@ class Repository(CaseClass):
     def save(self):
         """
         Persist current artifacts index to storage
+
         :return: None
         """
         xs = [x.to_dict() for x in self.artifacts]
         s = json.dumps(xs, ensure_ascii=False)
-        self.driver.write_index(s)
+        self.driver.write_index(to_unicode(s))
 
     def upload(self, group_id, local_path, artifact=None, force=False, print_only=False):
         """
         Upload local artifact and update index
+
         :param group_id: group id of the artifact
         :param local_path: source file path to upload
         :param artifact: artifact object to upload
@@ -77,6 +80,7 @@ class Repository(CaseClass):
     def download(self, group_id, local_path, revision=None, print_only=False):
         """
         Download specified artifact from repository
+
         :param group_id: group id of the artifact
         :param local_path: destination path (including file name)
                            artifact id, version and packaging is parsed from the file name
@@ -102,6 +106,7 @@ class Repository(CaseClass):
             logging.info('No artifacts.')
             return
 
+        buf = []
         if output == 'text':
             headers = ['FILE', '#', 'SIZE', 'BUILD', 'TAGS', 'SUMMARY']
             values = [
@@ -113,27 +118,29 @@ class Repository(CaseClass):
                     ','.join(x.scm_info.tags) if x.scm_info else '',
                     x.scm_info.summary if x.scm_info else '',
                 ] for x in arts]
-            column_len = [max([self._unicode_width(x) + 2 for x in xs]) for xs in zip(*([headers] + values))]
-            header_line = ' '.join(self._unicode_ljust(s, column_len[i]) for i, s in enumerate(headers)) + '\n'
-            fp.writelines([header_line, '-' * len(header_line) + '\n'])
-            for v in sorted(values):
-                self._write_safe(fp, ' '.join(self._unicode_ljust(s, column_len[i]) for i, s in enumerate(v)) + '\n')
+            column_len = [max([unicode_width(x) + 2 for x in xs]) for xs in zip(*([headers] + values))]
+            header_line = ' '.join(unicode_ljust(s, x) for s, x in zip(headers, column_len))
+            buf += [header_line, '-' * len(header_line)]
+            buf += (' '.join(unicode_ljust(s, x) for s, x in zip(v, column_len)) for v in sorted(values))
         elif output == 'json':
-            self._write_safe(fp, json.dumps([x.to_dict() for x in arts]) + '\n')
+            buf.append(json.dumps([x.to_dict() for x in arts], ensure_ascii=False))
         else:
             raise ValueError('Unknown output format: %s' % output)
+
+        for line in buf:
+            fp.write(to_str(line) + '\n')
 
     def print_info(self, group_id, file_name, revision=None, output=None, fp=sys.stdout):
         output = output or 'text'
         art = self._get_artifact_from_path(group_id, file_name, revision)
 
         if output == 'text':
-            s = '%s\n' % art
+            s = str(art)
         elif output == 'json':
-            s = json.dumps(art.to_dict(), ensure_ascii=False) + '\n'
+            s = json.dumps(art.to_dict(), ensure_ascii=False)
         else:
             raise ValueError('Unknown output format: %s' % output)
-        self._write_safe(fp, s)
+        fp.write(to_str(s) + '\n')
 
     def _get_artifact_from_path(self, group_id, path, revision=None):
         bi = BasicInfo.from_path(group_id, path)
@@ -170,24 +177,3 @@ class Repository(CaseClass):
     def _get_latest_artifact(self, group_id, artifact_id, version, packaging):
         ret = self._get_artifacts(group_id, artifact_id, version, packaging)
         return [max(ret, key=lambda x: x.basic_info.revision)] if ret else []
-
-    @classmethod
-    def _unicode_width(cls, s):
-        from unicodedata import east_asian_width
-
-        width = {'F': 2, 'H': 1, 'W': 2, 'Na': 1, 'A': 2, 'N': 1}
-
-        if not isinstance(s, unicode):
-            s = unicode(s, 'utf-8')
-        return sum(width[east_asian_width(c)] for c in s)
-
-    @classmethod
-    def _unicode_ljust(cls, s, len, ch=' '):
-        x = max(0, len - cls._unicode_width(s))
-        return s + ch * x
-
-    @classmethod
-    def _write_safe(cls, fp, s):
-        if isinstance(s, unicode):
-            s = s.encode('utf-8')
-        fp.write(s)

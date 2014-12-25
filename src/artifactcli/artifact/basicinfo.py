@@ -1,7 +1,7 @@
 import os
 import re
 from baseinfo import BaseInfo
-from artifactcli.util import assert_type
+from artifactcli.util import *
 
 
 class BasicInfo(BaseInfo):
@@ -17,14 +17,14 @@ class BasicInfo(BaseInfo):
 
     def __str__(self):
         buf = [
-            u'Basic Info:',
-            u'  Group ID   : %s' % self.group_id,
-            u'  Artifact ID: %s' % self.artifact_id,
-            u'  Version    : %s' % self.version,
-            u'  Packaging  : %s' % self.packaging,
-            u'  Revision   : %s' % self.revision
+            'Basic Info:',
+            '  Group ID   : %s' % self.group_id,
+            '  Artifact ID: %s' % self.artifact_id,
+            '  Version    : %s' % self.version,
+            '  Packaging  : %s' % self.packaging,
+            '  Revision   : %s' % self.revision
         ]
-        return assert_type(u'\n'.join(buf).encode('utf-8'), str)
+        return to_str('\n'.join(buf))
 
     def filename(self):
         return '%s-%s.%s' % (self.artifact_id, self.version, self.packaging)
