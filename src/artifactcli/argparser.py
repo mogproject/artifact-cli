@@ -49,4 +49,8 @@ def get_parser():
         '--bucket', dest='bucket', default=None, type='string',
         help='Amazon S3 bucket name'
     )
+    parser.add_option(
+        '--region', dest='region', default=None, type='string',
+        help='Amazon S3 region name (default: us-east-1)'
+    )
     return parser

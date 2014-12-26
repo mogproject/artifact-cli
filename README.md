@@ -58,10 +58,11 @@ Create ```~/.artifact-cli``` file and write credentials for AWS like this.
 aws_access_key_id = XXXXXXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 bucket = your-bucket-name
+region = ap-northeast-1
 ```
 
 Or you can use command line options instead of the configuration file.  
-(```--access ACCESS_KEY --secret SECRET_KEY --bucket BUCKET_NAME```)
+(```--access ACCESS_KEY --secret SECRET_KEY --bucket BUCKET_NAME --region REGION```)
 
 #### 5. Check connection
 

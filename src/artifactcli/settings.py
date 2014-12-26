@@ -61,6 +61,7 @@ class Settings(CaseClass):
         secret_key = self.options['secret_key']
         bucket = self.options['bucket']
         config = self.options['config']
+        region = self.options['region']
 
         if not all([access_key, secret_key, bucket]):
             # command line arguments are prior to the configuration file
@@ -87,7 +88,7 @@ class Settings(CaseClass):
                 return Settings(self.log_level)
 
         # set repository driver
-        driver = S3Driver(access_key, secret_key, bucket, group_id)
+        driver = S3Driver(access_key, secret_key, bucket, group_id, region)
         repo = Repository(driver)
         return Settings(self.log_level, self.operation, self.options, repo)
 

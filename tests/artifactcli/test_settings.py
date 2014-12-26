@@ -6,9 +6,9 @@ from artifactcli import *
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'print_only': False,
-                             'secret_key': None, 'config': '~/.artifact-cli', 'output': None}
-        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
+        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'region': None,
+                             'print_only': False, 'secret_key': None, 'config': '~/.artifact-cli', 'output': None}
+        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'region': None,
                           'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None}
 
     def _updated_opts(self, updates):
