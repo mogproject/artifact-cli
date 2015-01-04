@@ -31,8 +31,7 @@ class S3Driver(BaseDriver):
             self.region,
             aws_access_key_id=self.aws_access_key,
             aws_secret_access_key=self.aws_secret_key,
-            is_secure=True,
-            calling_format=OrdinaryCallingFormat())
+            is_secure=True)
         self.__bucket = self.__conn.get_bucket(self.bucket_name)
 
     def bucket(self):
@@ -106,6 +105,24 @@ class S3Driver(BaseDriver):
 
         k.get_contents_to_filename(local_path)
         logging.info('Downloaded: %s' % local_path)
+
+    def delete(self, remote_path, md5):
+        """
+        Delete file from S3 bucket.
+
+        :param remote_path: S3 path to delete
+        :param md5: MD5 digest hex string to verify
+        :return: None
+        """
+        k = self.bucket().get_key(remote_path)
+        if not k:
+            raise ValueError('File not found: %s' % self.s3_url(self.bucket(), remote_path))
+        remote_md5 = k.etag.strip('"')
+        assert md5 is None or md5 == remote_md5, \
+            'Failed to check MD5 digest: local=%s, remote=%s' % (md5, remote_md5)
+
+        k.delete()
+        logging.info('Deleted: %s' % remote_path)
 
     @classmethod
     def s3_url(cls, bucket_name, key):

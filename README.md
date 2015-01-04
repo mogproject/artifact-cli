@@ -24,6 +24,7 @@ Private Artifact Manager using Amazon S3
 - python-dateutil
 - GitPython
 - boto
+- moto (for testing)
 
 
 ### Installation
@@ -43,7 +44,7 @@ The responsibility of the AWS's charge is your own.
 
 #### 2. Create IAM User to access Amazon S3 (if need)
 
-Mangage your own **access key ID** and **secret access key** to call the APIs.
+Manage your own **access key ID** and **secret access key** to call the APIs.
 
 #### 3. Create Amazon S3 bucket
 
@@ -58,7 +59,7 @@ Create ```~/.artifact-cli``` file and write credentials for AWS like this.
 aws_access_key_id = XXXXXXXXXXXXXXXXXXXX
 aws_secret_access_key = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 bucket = your-bucket-name
-region = ap-northeast-1
+region = your-region (e.g. ap-northeast-1, us-east-1)
 ```
 
 Or you can use command line options instead of the configuration file.  

@@ -125,6 +125,29 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(Settings().parse_args(['art', 'info', 'gid', 'xxx', '1.0']), Settings())
         self.assertEqual(Settings().parse_args(['art', 'info', 'gid', 'xxx', 'LATEST']), Settings())
 
+    def test_parse_args_delete(self):
+        s = Settings().parse_args(['art', 'delete', 'gid', 'xxx', '123'])
+        self.assertEqual(s, Settings(operation=DeleteOperation(
+            'gid', ['xxx', '123'], False), options=self.default_opts))
+
+    def test_parse_args_delete_full(self):
+        s = Settings().parse_args(
+            ['art', 'delete', 'gid', 'xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
+        self.assertEqual(s, Settings(operation=DeleteOperation(
+            'gid', ['xxx', '123'], True), options=self.full_opts))
+
+    def test_parse_args_delete_error(self):
+        self.assertEqual(Settings().parse_args(['art', 'delete']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', '']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', 'a']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', 'abc']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', '1.0']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', 'latest']), Settings())
+        self.assertEqual(Settings().parse_args(['art', 'delete', 'gid', 'xxx', 'LATEST']), Settings())
+
     def test_parse_args_command_error(self):
         self.assertEqual(Settings().parse_args(['art', 'xxx', 'gid']), Settings())
 

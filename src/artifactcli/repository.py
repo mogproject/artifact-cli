@@ -99,6 +99,34 @@ class Repository(CaseClass):
         logging.info('Downloading artifact: \n%s\n' % art)
         self.driver.download(art.basic_info.s3_path(), local_path, art.file_info.md5)
 
+    def delete(self, group_id, file_name, revision, print_only=False):
+        """
+        Delete specified artifact from repository
+
+        :param group_id: group id of the artifact
+        :param file_name: file name of the artifact
+                          artifact id, version and packaging is parsed from the file name
+        :param revision: revision to delete (should not be none)
+        :param print_only:
+        :return: None
+        """
+        if revision is None:
+            raise ValueError('Revision should be specified to delete.')
+        art = self._get_artifact_from_path(group_id, file_name, revision)
+        bi = art.basic_info
+
+        # delete file
+        if print_only:
+            logging.info('Would delete artifact: \n\n%s\n' % art)
+            return
+
+        logging.info('Deleting artifact: \n%s\n' % art)
+        self.driver.delete(bi.s3_path(), art.file_info.md5)
+
+        # update index
+        self._del_artifacts(group_id, bi.artifact_id, bi.version, bi.packaging, revision)
+        self.save()
+
     def print_list(self, group_id, output=None, fp=sys.stdout):
         output = output or 'text'
         arts = [x for x in self.artifacts if x.basic_info.group_id == group_id]
@@ -164,14 +192,23 @@ class Repository(CaseClass):
                 % (group_id, artifact_id, version, packaging, revision))
         return arts[0]
 
+    @classmethod
+    def _match_artifact(cls, artifact, group_id, artifact_id=None, version=None, packaging=None, revision=None):
+        return (artifact.basic_info.group_id == group_id
+                and (artifact_id is None or artifact.basic_info.artifact_id == artifact_id)
+                and (version is None or artifact.basic_info.version == version)
+                and (packaging is None or artifact.basic_info.packaging == packaging)
+                and (revision is None or artifact.basic_info.revision == revision))
+
     def _get_artifacts(self, group_id, artifact_id=None, version=None, packaging=None, revision=None):
         return [
-            x for x in self.artifacts
-            if x.basic_info.group_id == group_id
-            and (artifact_id is None or x.basic_info.artifact_id == artifact_id)
-            and (version is None or x.basic_info.version == version)
-            and (packaging is None or x.basic_info.packaging == packaging)
-            and (revision is None or x.basic_info.revision == revision)
+            x for x in self.artifacts if self._match_artifact(x, group_id, artifact_id, version, packaging, revision)
+        ]
+
+    def _del_artifacts(self, group_id, artifact_id, version, packaging, revision):
+        self.artifacts = [
+            x for x in self.artifacts if
+            not self._match_artifact(x, group_id, artifact_id, version, packaging, revision)
         ]
 
     def _get_latest_artifact(self, group_id, artifact_id, version, packaging):

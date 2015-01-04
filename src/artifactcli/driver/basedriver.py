@@ -20,3 +20,7 @@ class BaseDriver(CaseClass):
     @abstractmethod
     def download(self, remote_path, local_path, md5):
         """abstract method"""
+
+    @abstractmethod
+    def delete(self, remote_path, md5):
+        """abstract method"""

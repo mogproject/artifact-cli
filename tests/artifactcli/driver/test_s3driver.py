@@ -45,7 +45,14 @@ class TestS3Driver(unittest.TestCase):
         d = self._get_driver()
         d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/c/test-artifact-1.2.3.dat',
                  '7a38cb250db7127113e00ad5e241d563')
+        self.assertFalse(d.bucket().get_key('a/b/c/test-artifact-1.2.3.dat') is None)
+        self.assertEqual(d.bucket().get_key('a/b/c/test-artifact-1.2.3.dat').etag.strip('"'),
+                         '7a38cb250db7127113e00ad5e241d563')
+
         d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/x/test-artifact-1.2.3.dat', None)
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
+        self.assertEqual(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat').etag.strip('"'),
+                         '7a38cb250db7127113e00ad5e241d563')
 
     @mock_s3
     def test_upload_md5_error(self):
@@ -56,6 +63,9 @@ class TestS3Driver(unittest.TestCase):
     def test_download(self):
         d = self._get_driver()
         d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/x/test-artifact-1.2.3.dat', None)
+
+        # assert uploading
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
 
         if os.path.exists(self.tmp_path):
             os.remove(self.tmp_path)
@@ -73,9 +83,42 @@ class TestS3Driver(unittest.TestCase):
         d = self._get_driver()
         d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/x/test-artifact-1.2.3.dat', None)
 
+        # assert uploading
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
+
         self.assertFalse(os.path.exists(self.tmp_path))
         self.assertRaises(AssertionError, d.download, 'a/b/x/test-artifact-1.2.3.dat', self.tmp_path, '7a')
         self.assertFalse(os.path.exists(self.tmp_path))
+
+    @mock_s3
+    def test_delete(self):
+        d = self._get_driver()
+        d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/x/test-artifact-1.2.3.dat', None)
+
+        # assert uploading
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
+
+        d.delete('a/b/x/test-artifact-1.2.3.dat', '7a38cb250db7127113e00ad5e241d563')
+
+        # assert key is deleted
+        self.assertTrue(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
+
+    @mock_s3
+    def test_delete_not_found(self):
+        self.assertRaises(ValueError, self._get_driver().delete, 'a/b/c/test-artifact-1.2.3.dat', None)
+
+    @mock_s3
+    def test_delete_md5_error(self):
+        d = self._get_driver()
+        d.upload('tests/resources/test-artifact-1.2.3.dat', 'a/b/x/test-artifact-1.2.3.dat', None)
+
+        # assert uploading
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
+
+        self.assertRaises(AssertionError, d.delete, 'a/b/x/test-artifact-1.2.3.dat', '7a')
+
+        # assert key is remained
+        self.assertFalse(d.bucket().get_key('a/b/x/test-artifact-1.2.3.dat') is None)
 
     def test_s3_url(self):
         self.assertEqual(S3Driver.s3_url('bucket-name', 'a/b/c'), 's3://bucket-name/a/b/c')
