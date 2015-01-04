@@ -6,7 +6,7 @@ USAGE = """
   %prog [options] upload   GROUP LOCAL_PATH
   %prog [options] download GROUP LOCAL_PATH [REVISION | latest]
   %prog [options] info     GROUP FILE_NAME  [REVISION | latest]
-  %prog [options] delete   GROUP FILE_NAME  [REVISION]
+  %prog [options] delete   GROUP FILE_NAME   REVISION
 
   e.g.
    GROUP     : your.company
