@@ -86,6 +86,9 @@ class TestRepository(unittest.TestCase):
         r.load()
         self.assertEqual(r.artifacts, self.artifacts_for_test)
 
+    #
+    # upload
+    #
     def test_upload_new_artifact(self):
         expected = [Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
                              FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
@@ -200,6 +203,9 @@ class TestRepository(unittest.TestCase):
 
         self.assertEqual(r.artifacts, expected)
 
+    #
+    # download
+    #
     def test_download_specified_revision(self):
         r = Repository(MockDriver())
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
@@ -258,6 +264,241 @@ class TestRepository(unittest.TestCase):
         ]
         self.assertRaises(ValueError, r.download, 'com.github.mogproject', '/tmp/art-test-0.0.1.jar', 123)
 
+    #
+    # delete
+    #
+    def test_delete_specified_revision(self):
+        r = Repository(MockDriver())
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+
+        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 2)
+        self.assertEqual(r.driver.uploaded_data, {
+            'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.1/3/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.2/1/art-test-0.0.2.jar': (
+                '/path/to/art-test-0.0.2.jar', 'ffffeeeeddddccccbbbbaaaa99998888')
+        })
+
+        expected = [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
+                     FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'third commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ]
+        self.assertEqual(r.artifacts, expected)
+
+        # assume artifact is automatically saved
+        r.artifacts = []
+        r.load()
+        self.assertEqual(r.artifacts, expected)
+
+    def test_delete_revision_can_be_reused(self):
+        r = Repository(MockDriver())
+
+        # [] -> [1] -> []
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 1)
+        self.assertEqual(r.artifacts, [])
+
+        # [] -> [1]
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        self.assertEqual(r.artifacts, [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ])
+
+        # [1] -> [1, 2] -> [2]
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 1)
+        self.assertEqual(r.artifacts, [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
+                     FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'second commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ])
+
+        # [2] -> [2, 3]
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        self.assertEqual(r.artifacts, [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
+                     FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'second commit',
+                             '111122223333444455556666777788889999aaaa')),
+
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
+                     FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'third commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ])
+
+        # [2, 3] -> [2] -> [2, 3]
+        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 3)
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        self.assertEqual(r.artifacts, [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
+                     FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'second commit',
+                             '111122223333444455556666777788889999aaaa')),
+
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
+                     FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'third commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ])
+
+    def test_delete_revision_not_specified(self):
+        r = Repository(MockDriver())
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+
+        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', None)
+
+        self.assertEqual(r.driver.uploaded_data, {
+            'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.1/2/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.1/3/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.2/1/art-test-0.0.2.jar': (
+                '/path/to/art-test-0.0.2.jar', 'ffffeeeeddddccccbbbbaaaa99998888')
+        })
+
+        expected = [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
+                     FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'second commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
+                     FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'third commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ]
+        self.assertEqual(r.artifacts, expected)
+
+    def test_delete_print_only(self):
+        r = Repository(MockDriver())
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+
+        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 2, print_only=True)
+        self.assertEqual(r.driver.uploaded_data, {
+            'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.1/2/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.1/3/art-test-0.0.1.jar': (
+                '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
+            'com.github.mogproject/art-test/0.0.2/1/art-test-0.0.2.jar': (
+                '/path/to/art-test-0.0.2.jar', 'ffffeeeeddddccccbbbbaaaa99998888')
+        })
+
+        expected = [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
+                     FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'second commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
+                     FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'third commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ]
+        self.assertEqual(r.artifacts, expected)
+
+    def test_delete_no_such_revision(self):
+        r = Repository(MockDriver())
+        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', 123)
+
+    def test_delete_broken_index_error(self):
+        r = Repository(MockDriver())
+        r.artifacts = [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 123),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 123),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa')),
+        ]
+        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', 123)
+
+    #
+    # print_list
+    #
     def test_print_list_empty(self):
         r = Repository(MockDriver())
         r.print_list('com.github.mogproject')
@@ -326,6 +567,9 @@ class TestRepository(unittest.TestCase):
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
         self.assertRaises(ValueError, r.print_list, 'com.github.mogproject', 'xxxx')
 
+    #
+    # print_info
+    #
     def test_print_info_output_text(self):
         r = Repository(MockDriver())
         r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[4])

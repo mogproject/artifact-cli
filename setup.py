@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='artifact-cli',
-    version='0.0.3',
+    version='0.0.4',
     description='Private Artifact Manager using Amazon S3',
     author='mogproject',
     author_email='mogproj@gmail.com',
