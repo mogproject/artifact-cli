@@ -35,6 +35,12 @@ Just install via pip! (may need ```sudo``` command)
 pip install git+https://github.com/mogproject/artifact-cli
 ```
 
+### Upgrading
+
+```
+pip install --upgrade git+https://github.com/mogproject/artifact-cli
+art --version
+```
 
 ### Quickstart Guide
 
