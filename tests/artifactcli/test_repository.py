@@ -513,13 +513,57 @@ class TestRepository(unittest.TestCase):
         fp = StringIO()
         r.print_list('com.github.mogproject', fp=fp)
         self.assertEqual(fp.getvalue(), '\n'.join([
-            'FILE                 #   SIZE      BUILD                 TAGS            SUMMARY        ',
-            '----------------------------------------------------------------------------------------',
-            'art-test-0.0.1.jar   1   4.4MiB    2014-12-31 09:12:34   release 0.0.1   first commit   ',
-            'art-test-0.0.1.jar   2   21.7KiB   2014-12-31 09:12:34   release 0.0.1   second commit  ',
-            'art-test-0.0.1.jar   3   32.6KiB   2014-12-31 09:12:34   release 0.0.1   third commit   ',
-            'art-test-0.0.1.jar   4   43.4KiB   2014-12-31 09:12:34                                  ',
-            'art-test-0.0.2.jar   1   4.4MiB    2014-12-31 09:12:34   release 0.0.2   new version    ']) + '\n')
+            'FILE                   #    SIZE      BUILD                 TAGS            SUMMARY        ',
+            '-------------------------------------------------------------------------------------------',
+            'art-test-0.0.1.jar      1   4.4MiB    2014-12-31 09:12:34   release 0.0.1   first commit   ',
+            'art-test-0.0.1.jar      2   21.7KiB   2014-12-31 09:12:34   release 0.0.1   second commit  ',
+            'art-test-0.0.1.jar      3   32.6KiB   2014-12-31 09:12:34   release 0.0.1   third commit   ',
+            'art-test-0.0.1.jar      4   43.4KiB   2014-12-31 09:12:34                                  ',
+            'art-test-0.0.2.jar      1   4.4MiB    2014-12-31 09:12:34   release 0.0.2   new version    ',
+        ]) + '\n')
+        fp.close()
+
+    def test_print_list_output_text_long(self):
+        r = Repository(MockDriver())
+        for i in range(15):
+            r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
+            r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
+        fp = StringIO()
+        r.print_list('com.github.mogproject', fp=fp)
+        self.assertEqual(fp.getvalue(), '\n'.join([
+            'FILE                   #    SIZE     BUILD                 TAGS            SUMMARY       ',
+            '-----------------------------------------------------------------------------------------',
+            'art-test-0.0.1.jar      1   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      2   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      3   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      4   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      5   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      6   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      7   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      8   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar      9   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     10   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     11   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     12   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     13   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     14   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.1.jar     15   4.4MiB   2014-12-31 09:12:34   release 0.0.1   first commit  ',
+            'art-test-0.0.2.jar      1   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      2   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      3   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      4   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      5   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      6   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      7   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      8   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar      9   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     10   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     11   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     12   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     13   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     14   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+            'art-test-0.0.2.jar     15   4.4MiB   2014-12-31 09:12:34   release 0.0.2   new version   ',
+        ]) + '\n')
         fp.close()
 
     def test_print_list_output_json(self):
@@ -544,19 +588,46 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'second commit',
                              '111122223333444455556666777788889999aaaa')),
-            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', 1),
-                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
-                              'ffffeeeeddddccccbbbbaaaa99998888'),
-                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
-                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
-                             '111122223333444455556666777788889999aaaa')),
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 3),
                      FileInfo('host1', 'user1', 33333, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', 1),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa')),
         ])
+        fp.close()
+
+    def test_print_list_output_json_long(self):
+        r = Repository(MockDriver())
+        for i in range(15):
+            r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
+            r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
+        fp = StringIO()
+        r.print_list('com.github.mogproject', output='json', fp=fp)
+        arts = [Artifact.from_dict(d) for d in json.loads(fp.getvalue())]
+        self.assertEqual(arts, [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', i),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'first commit',
+                             '111122223333444455556666777788889999aaaa'))
+            for i in range(1, 16)
+        ] + [
+                             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
+                                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                                               'ffffeeeeddddccccbbbbaaaa99998888'),
+                                      GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                                              datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                                              '111122223333444455556666777788889999aaaa'))
+                             for i in range(1, 16)
+                         ])
         fp.close()
 
     def test_print_list_output_error(self):

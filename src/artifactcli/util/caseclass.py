@@ -9,11 +9,18 @@ class CaseClass(object):
         """
         self.__keys = keys
 
-    def __eq__(self, other):
-        return isinstance(other, self.__class__) and all(getattr(self, k) == getattr(other, k) for k in self.__keys)
+    def __cmp__(self, other):
+        if not isinstance(other, self.__class__):
+            # compare with class names
+            return cmp(self.__class__.__name__, other.__class__.__name__)
 
-    def __ne__(self, other):
-        return not self == other
+        for k in self.__keys:
+            a, b = getattr(self, k), getattr(other, k)
+            if a < b:
+                return -1
+            if a > b:
+                return 1
+        return 0
 
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, ', '.join('%s=%r' % (k, getattr(self, k)) for k in self.__keys))

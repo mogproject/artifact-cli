@@ -129,18 +129,18 @@ class Repository(CaseClass):
 
     def print_list(self, group_id, output=None, fp=sys.stdout):
         output = output or 'text'
-        arts = [x for x in self.artifacts if x.basic_info.group_id == group_id]
+        arts = sorted(x for x in self.artifacts if x.basic_info.group_id == group_id)
         if not arts:
             logging.info('No artifacts.')
             return
 
         buf = []
         if output == 'text':
-            headers = ['FILE', '#', 'SIZE', 'BUILD', 'TAGS', 'SUMMARY']
+            headers = ['FILE', '  #', 'SIZE', 'BUILD', 'TAGS', 'SUMMARY']
             values = [
                 [
                     '%s-%s.%s' % (x.basic_info.artifact_id, x.basic_info.version, x.basic_info.packaging),
-                    '%s' % x.basic_info.revision,
+                    '%4.d' % x.basic_info.revision,
                     x.file_info.size_format(),
                     '%s' % x.file_info.mtime,
                     ','.join(x.scm_info.tags) if x.scm_info else '',
@@ -149,7 +149,7 @@ class Repository(CaseClass):
             column_len = [max([unicode_width(x) + 2 for x in xs]) for xs in zip(*([headers] + values))]
             header_line = ' '.join(unicode_ljust(s, x) for s, x in zip(headers, column_len))
             buf += [header_line, '-' * len(header_line)]
-            buf += (' '.join(unicode_ljust(s, x) for s, x in zip(v, column_len)) for v in sorted(values))
+            buf += (' '.join(unicode_ljust(s, x) for s, x in zip(v, column_len)) for v in values)
         elif output == 'json':
             buf.append(json.dumps([x.to_dict() for x in arts], ensure_ascii=False))
         else:
