@@ -32,13 +32,13 @@ Private Artifact Manager using Amazon S3
 Just install via pip! (may need ```sudo``` command)
 
 ```
-pip install git+https://github.com/mogproject/artifact-cli
+pip install artifact-cli
 ```
 
 ### Upgrading
 
 ```
-pip install --upgrade git+https://github.com/mogproject/artifact-cli
+pip install --upgrade artifact-cli
 art --version
 ```
 
