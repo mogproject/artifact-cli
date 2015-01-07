@@ -6,7 +6,7 @@ setup(
     description='Private Artifact Manager using Amazon S3',
     author='mogproject',
     author_email='mogproj@gmail.com',
-    url='http://about.me/mogproject',
+    url='https://github.com/mogproject/artifact-cli',
     install_requires=[
         'pytz',
         'python-dateutil',
