@@ -9,8 +9,8 @@ class ListOperation(BaseOperation):
     def run(self, repo):
         # suppress logging
         logging.getLogger().disabled = True
-        repo.load()
+        repo.load_all()
         logging.getLogger().disabled = False
 
-        repo.print_list(self.group_id, self.output)
+        repo.print_list(self.output)
         return 0

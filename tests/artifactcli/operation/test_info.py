@@ -25,11 +25,12 @@ class TestInfoOperation(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa')),
         ]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', arts[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', arts[1])
+        r = Repository(MockDriver(), 'com.github.mogproject')
+        r.upload('/path/to/art-test-0.0.1.jar', arts[0])
+        r.upload('/path/to/art-test-0.0.1.jar', arts[1])
+        r.save('art-test')
 
-        r.artifacts = []
+        r.artifacts = {}
 
         rc = InfoOperation('com.github.mogproject', ['art-test-0.0.1.jar', '1']).run(r)
         self.assertEqual(rc, 0)
@@ -41,6 +42,6 @@ class TestInfoOperation(unittest.TestCase):
         self.assertEqual(rc, 0)
 
     def test_run_error(self):
-        r = Repository(MockDriver())
+        r = Repository(MockDriver(), 'com.github.mogproject')
         rc = InfoOperation('com.github.mogproject', ['art-test-0.0.1.jar', '1']).run(r)
         self.assertEqual(rc, 2)

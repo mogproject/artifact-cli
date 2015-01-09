@@ -89,7 +89,7 @@ class Settings(CaseClass):
 
         # set repository driver
         driver = S3Driver(access_key, secret_key, bucket, group_id, region)
-        repo = Repository(driver)
+        repo = Repository(driver, group_id)
         return Settings(self.log_level, self.operation, self.options, repo)
 
     @classmethod

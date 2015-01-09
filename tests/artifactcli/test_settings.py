@@ -50,25 +50,25 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_download(self):
         s = Settings().parse_args(['art', 'download', 'gid', '/path/to/xxx', '123'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', '123'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', '123'], False),
+                                     options=self.default_opts))
 
         s = Settings().parse_args(['art', 'download', 'gid', '/path/to/xxx', 'latest'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', 'latest'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', 'latest'], False),
+                                     options=self.default_opts))
 
     def test_parse_args_download_full(self):
         s = Settings().parse_args(
             ['art', 'download', 'gid', '/path/to/xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
              'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', '123'], True), options=self.full_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', '123'], True),
+                                     options=self.full_opts))
 
         s = Settings().parse_args(
             ['art', 'download', 'gid', '/path/to/xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
              'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', 'latest'], True), options=self.full_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', 'latest'], True),
+                                     options=self.full_opts))
 
     def test_parse_args_download_error(self):
         self.assertEqual(Settings().parse_args(['art', 'download']), Settings())
@@ -82,12 +82,11 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_info(self):
         s = Settings().parse_args(['art', 'info', 'gid', 'xxx', '123'])
-        self.assertEqual(s, Settings(operation=InfoOperation(
-            'gid', ['xxx', '123'], None), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', '123'], None), options=self.default_opts))
 
         s = Settings().parse_args(['art', 'info', 'gid', 'xxx', 'latest'])
-        self.assertEqual(s, Settings(operation=InfoOperation(
-            'gid', ['xxx', 'latest'], None), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], None),
+                                     options=self.default_opts))
 
     def test_parse_args_info_full(self):
         s = Settings().parse_args(
@@ -127,15 +126,15 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_delete(self):
         s = Settings().parse_args(['art', 'delete', 'gid', 'xxx', '123'])
-        self.assertEqual(s, Settings(operation=DeleteOperation(
-            'gid', ['xxx', '123'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DeleteOperation('gid', ['xxx', '123'], False),
+                                     options=self.default_opts))
 
     def test_parse_args_delete_full(self):
         s = Settings().parse_args(
             ['art', 'delete', 'gid', 'xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
              'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DeleteOperation(
-            'gid', ['xxx', '123'], True), options=self.full_opts))
+        self.assertEqual(s, Settings(operation=DeleteOperation('gid', ['xxx', '123'], True),
+                                     options=self.full_opts))
 
     def test_parse_args_delete_error(self):
         self.assertEqual(Settings().parse_args(['art', 'delete']), Settings())
@@ -176,7 +175,7 @@ class TestSettings(unittest.TestCase):
             operation=ListOperation('gid', []),
             options=self._updated_opts(
                 {'access_key': 'ACCESS_KEY', 'secret_key': 'SECRET_KEY', 'bucket': 'BUCKET'}),
-            repo=Repository(S3Driver('ACCESS_KEY', 'SECRET_KEY', 'BUCKET', 'gid'))
+            repo=Repository(S3Driver('ACCESS_KEY', 'SECRET_KEY', 'BUCKET', 'gid'), 'gid')
         )
         self.assertEqual(s.load_config(), t)
 
@@ -199,7 +198,7 @@ class TestSettings(unittest.TestCase):
         t = Settings(
             operation=ListOperation('gid', []),
             options=self._updated_opts({'config': 'tests/resources/test-artifact-cli.conf', 'bucket': 'bucket4art'}),
-            repo=Repository(S3Driver('XXX', 'YYY', 'bucket4art', 'gid'))
+            repo=Repository(S3Driver('XXX', 'YYY', 'bucket4art', 'gid'), 'gid')
         )
         self.assertEqual(s.load_config(), t)
 

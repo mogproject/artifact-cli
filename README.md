@@ -134,11 +134,13 @@ The structure of the paths is the following.
 
 ```
 your-bucket-name
-├── group.id.1                     // group ID
-│   ├── artifact-cli-index.json    // Index data is written as JSON in each group's directory
-│   ├── awesome-project            // artifact ID
-│   │   ├── 0.0.1                  // version
-│   │   │   ├── 1                  // revision (auto assigned, starting from 1)
+├── group.id.1                          // group ID
+│   ├── .meta                           // meta data directory for each group
+│   │   ├── index-awesome-project.json  // index data is written as JSON for each artifact id
+│   │   └── index-play-project.json
+│   ├── awesome-project                 // artifact ID
+│   │   ├── 0.0.1                       // version
+│   │   │   ├── 1                       // revision (auto assigned, starting from 1)
 |   │   │   │   └── awesome-project-0.0.1.jar
 |   │   │   ├── 2
 |   │   │   │   └── awesome-project-0.0.1.jar
@@ -156,8 +158,9 @@ your-bucket-name
 │           └── 1
 |               └── play-project-0.0.1.zip
 └── group.id.2
-    ├── artifact-cli-index.json
-    └── awesome-project            // completely separated to the group.id.1's artifact
+    ├── .meta
+    │   └── index-awesome-project.json 
+     └── awesome-project            // completely separated to the group.id.1's artifact
         └── 0.0.1
             └── 1
                 └── awesome-project-0.0.1.zip

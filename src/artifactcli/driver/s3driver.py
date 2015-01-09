@@ -1,4 +1,5 @@
 import logging
+import re
 import boto
 import boto.s3
 from boto.s3.key import Key
@@ -7,7 +8,7 @@ from basedriver import BaseDriver
 from artifactcli.util import assert_type
 
 DEFAULT_REGION = 'us-east-1'
-DEFAULT_INDEX_NAME = 'artifact-cli-index.json'
+DEFAULT_INDEX_PREFIX = '.meta/index-'
 
 
 class S3Driver(BaseDriver):
@@ -16,13 +17,13 @@ class S3Driver(BaseDriver):
     """
 
     def __init__(self, aws_access_key, aws_secret_key, bucket_name, group_id,
-                 region=None, index_name=None, connection=None):
-        super(S3Driver, self).__init__(['aws_access_key', 'aws_secret_key', 'bucket_name', 'region', 'index_path'])
+                 region=None, index_prefix=None, connection=None):
+        super(S3Driver, self).__init__(['aws_access_key', 'aws_secret_key', 'bucket_name', 'region', 'index_prefix'])
         self.aws_access_key = aws_access_key
         self.aws_secret_key = aws_secret_key
         self.bucket_name = bucket_name
         self.region = region or DEFAULT_REGION
-        self.index_path = '%s/%s' % (group_id, (index_name or DEFAULT_INDEX_NAME))
+        self.index_prefix = '%s/%s' % (group_id, index_prefix or DEFAULT_INDEX_PREFIX)
         self.__conn = connection
         self.__bucket = None
 
@@ -39,33 +40,50 @@ class S3Driver(BaseDriver):
             self.connect()
         return self.__bucket
 
-    def read_index(self):
+    def index_path(self, artifact_id):
+        return '%s%s.json' % (self.index_prefix, artifact_id)
+
+    def artifact_ids(self):
+        """
+        Get list of the artifact IDs in the directory
+
+        :return: sorted list of artifact IDs
+        """
+        keys = [k.name[len(self.index_prefix):] for k in self.bucket().list(prefix=self.index_prefix)]
+        results = [re.search('(.*)[.]json', k) for k in keys]
+        return sorted(r.group(1) for r in results if r)
+
+    def read_index(self, artifact_id):
         """
         Read index data from S3 bucket.
 
+        :param artifact_id: artifact id to read
         :return: index json text in unicode
         """
-        logging.info('Reading index: %s' % self.s3_url(self.bucket_name, self.index_path))
-        k = self.bucket().get_key(self.index_path)
+        index_path = self.index_path(artifact_id)
+        logging.info('Reading index: %s' % self.s3_url(self.bucket_name, index_path))
+        k = self.bucket().get_key(index_path)
         if k:
             s = k.get_contents_as_string(encoding='utf-8')
         else:
-            s = u''
+            s = unicode()
 
         return assert_type(s, unicode)
 
-    def write_index(self, s):
+    def write_index(self, artifact_id, s):
         """
         Write index data to S3 bucket.
 
+        :param artifact_id: artifact id to write
         :param s: index json text in unicode
         :return: None
         """
         assert_type(s, unicode)
 
-        logging.info('Writing index: %s' % self.s3_url(self.bucket_name, self.index_path))
+        index_path = self.index_path(artifact_id)
+        logging.info('Writing index: %s' % self.s3_url(self.bucket_name, index_path))
         k = Key(self.bucket())
-        k.key = self.index_path
+        k.key = index_path
         k.set_metadata('Content-Type', 'application/json; charset=utf-8')
         k.set_contents_from_string(s.encode('utf-8'))
 

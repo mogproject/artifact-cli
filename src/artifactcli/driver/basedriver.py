@@ -6,11 +6,15 @@ class BaseDriver(CaseClass):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def read_index(self):
+    def artifact_ids(self):
         """abstract method"""
 
     @abstractmethod
-    def write_index(self, s):
+    def read_index(self, artifact_id):
+        """abstract method"""
+
+    @abstractmethod
+    def write_index(self, artifact_id, s):
         """abstract method"""
 
     @abstractmethod

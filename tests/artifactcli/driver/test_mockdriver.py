@@ -10,14 +10,14 @@ class TestMockDriver(unittest.TestCase):
     def test_read_index(self):
         # read empty
         m = MockDriver()
-        self.assertEqual(m.read_index(), '')
+        self.assertEqual(m.read_index('test-artifact'), '')
 
     def test_write_index(self):
         # write some index data then read it
         s = u'index1\nindex2\nindex3'
         m = MockDriver()
-        m.write_index(s)
-        self.assertEqual(m.read_index(), s)
+        m.write_index('test-artifact', s)
+        self.assertEqual(m.read_index('test-artifact'), s)
 
     def test_upload(self):
         m = MockDriver()

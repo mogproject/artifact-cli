@@ -6,6 +6,8 @@ def assert_type(value, class_or_type_or_tuple):
     :param class_or_type_or_tuple: expected type
     :return: value of expected type
     """
-    s = "Value type of %r is not %r but %s."
-    assert isinstance(value, class_or_type_or_tuple), s % (value, class_or_type_or_tuple, type(value))
+    s = "%r must be %r, not %s."
+    if not isinstance(value, class_or_type_or_tuple):
+        raise TypeError(s % (value, class_or_type_or_tuple, type(value)))
+
     return value

@@ -2,41 +2,54 @@ import json
 import logging
 import sys
 from copy import deepcopy
+from collections import defaultdict
 from artifact import Artifact, BasicInfo
 from util import *
 
 
 class Repository(CaseClass):
-    def __init__(self, driver):
-        super(Repository, self).__init__(['driver', 'artifacts'])
+    def __init__(self, driver, group_id):
+        super(Repository, self).__init__(['driver', 'group_id', 'artifacts'])
         self.driver = driver
-        self.artifacts = []
+        self.group_id = group_id
+        self.artifacts = defaultdict(list)
 
-    def load(self):
+    def load(self, artifact_id):
         """
-        Load artifacts index from storage
+        Load artifacts index for specified artifact id from storage
 
+        :param artifact_id: artifact id to load
         :return: None
         """
-        s = self.driver.read_index()
+        s = self.driver.read_index(artifact_id)
         xs = json.loads(s, encoding='utf-8') if s else []
-        self.artifacts = [Artifact.from_dict(x) for x in xs]
+        self.artifacts[artifact_id] = [Artifact.from_dict(x) for x in xs]
 
-    def save(self):
+    def load_all(self):
         """
-        Persist current artifacts index to storage
+        Load all artifacts index from storage
 
         :return: None
         """
-        xs = [x.to_dict() for x in self.artifacts]
-        s = json.dumps(xs, ensure_ascii=False)
-        self.driver.write_index(to_unicode(s))
+        self.artifacts = defaultdict(list)
+        for artifact_id in self.driver.artifact_ids():
+            self.load(artifact_id)
 
-    def upload(self, group_id, local_path, artifact=None, force=False, print_only=False):
+    def save(self, artifact_id):
+        """
+        Persist current artifacts index for specified artifact id to storage
+
+        :param artifact_id: artifact id to save
+        :return: None
+        """
+        xs = [x.to_dict() for x in self.artifacts[artifact_id]]
+        s = json.dumps(xs, ensure_ascii=False)
+        self.driver.write_index(artifact_id, to_unicode(s))
+
+    def upload(self, local_path, artifact=None, force=False, print_only=False):
         """
         Upload local artifact and update index
 
-        :param group_id: group id of the artifact
         :param local_path: source file path to upload
         :param artifact: artifact object to upload
                          If artifact is None, generate artifact object from local_path.
@@ -45,23 +58,22 @@ class Repository(CaseClass):
         :param print_only:
         :return: None
         """
-
         art = deepcopy(artifact)
         if not artifact:
-            art = Artifact.from_path(group_id, local_path)
+            art = Artifact.from_path(self.group_id, local_path)
 
-        # check if the artifact is already in index
         bi = art.basic_info
         fi = art.file_info
 
-        revisions = self._get_artifacts(bi.group_id, bi.artifact_id, bi.version, bi.packaging)
+        # check if the artifact is already in index
+        revisions = self._get_artifacts(bi.artifact_id, bi.version, bi.packaging)
         xs = [x for x in revisions if (x.file_info.size, x.file_info.md5) == (fi.size, fi.md5)]
         if xs and not force:
             logging.warn('Already uploaded as:\n%s' % xs[0])
             return
 
         # increment revision
-        latest = self._get_latest_artifact(bi.group_id, bi.artifact_id, bi.version, bi.packaging)
+        latest = self._get_latest_artifact(bi.artifact_id, bi.version, bi.packaging)
         current_revision = latest[0].basic_info.revision if latest else 0
         bi.revision = current_revision + 1
 
@@ -74,14 +86,12 @@ class Repository(CaseClass):
         self.driver.upload(local_path, bi.s3_path(), fi.md5)
 
         # update index
-        self.artifacts.append(art)
-        self.save()
+        self.artifacts[bi.artifact_id].append(art)
 
-    def download(self, group_id, local_path, revision=None, print_only=False):
+    def download(self, local_path, revision=None, print_only=False):
         """
         Download specified artifact from repository
 
-        :param group_id: group id of the artifact
         :param local_path: destination path (including file name)
                            artifact id, version and packaging is parsed from the file name
         :param revision: revision to download
@@ -89,7 +99,7 @@ class Repository(CaseClass):
         :param print_only:
         :return: None
         """
-        art = self._get_artifact_from_path(group_id, local_path, revision)
+        art = self.get_artifact_from_path(local_path, revision)
 
         # download file
         if print_only:
@@ -99,11 +109,10 @@ class Repository(CaseClass):
         logging.info('Downloading artifact: \n%s\n' % art)
         self.driver.download(art.basic_info.s3_path(), local_path, art.file_info.md5)
 
-    def delete(self, group_id, file_name, revision, print_only=False):
+    def delete(self, file_name, revision, print_only=False):
         """
         Delete specified artifact from repository
 
-        :param group_id: group id of the artifact
         :param file_name: file name of the artifact
                           artifact id, version and packaging is parsed from the file name
         :param revision: revision to delete (should not be none)
@@ -112,7 +121,7 @@ class Repository(CaseClass):
         """
         if revision is None:
             raise ValueError('Revision should be specified to delete.')
-        art = self._get_artifact_from_path(group_id, file_name, revision)
+        art = self.get_artifact_from_path(file_name, revision)
         bi = art.basic_info
 
         # delete file
@@ -124,12 +133,11 @@ class Repository(CaseClass):
         self.driver.delete(bi.s3_path(), art.file_info.md5)
 
         # update index
-        self._del_artifacts(group_id, bi.artifact_id, bi.version, bi.packaging, revision)
-        self.save()
+        self._del_artifacts(bi.artifact_id, bi.version, bi.packaging, revision)
 
-    def print_list(self, group_id, output=None, fp=sys.stdout):
+    def print_list(self, output=None, fp=sys.stdout):
         output = output or 'text'
-        arts = sorted(x for x in self.artifacts if x.basic_info.group_id == group_id)
+        arts = sorted(x for xs in self.artifacts.values() for x in xs)
         if not arts:
             logging.info('No artifacts.')
             return
@@ -158,9 +166,9 @@ class Repository(CaseClass):
         for line in buf:
             fp.write(to_str(line) + '\n')
 
-    def print_info(self, group_id, file_name, revision=None, output=None, fp=sys.stdout):
+    def print_info(self, file_name, revision=None, output=None, fp=sys.stdout):
         output = output or 'text'
-        art = self._get_artifact_from_path(group_id, file_name, revision)
+        art = self.get_artifact_from_path(file_name, revision)
 
         if output == 'text':
             s = str(art)
@@ -170,47 +178,47 @@ class Repository(CaseClass):
             raise ValueError('Unknown output format: %s' % output)
         fp.write(to_str(s) + '\n')
 
-    def _get_artifact_from_path(self, group_id, path, revision=None):
-        bi = BasicInfo.from_path(group_id, path)
-        return self._get_artifact(group_id, bi.artifact_id, bi.version, bi.packaging, revision)
+    def get_artifact_from_path(self, path, revision=None):
+        bi = BasicInfo.from_path(self.group_id, path)
+        return self._get_artifact(bi.artifact_id, bi.version, bi.packaging, revision)
 
-    def _get_artifact(self, group_id, artifact_id, version, packaging, revision=None):
+    def _get_artifact(self, artifact_id, version, packaging, revision=None):
         if revision is None:
-            arts = self._get_latest_artifact(group_id, artifact_id, version, packaging)
+            arts = self._get_latest_artifact(artifact_id, version, packaging)
         else:
-            arts = self._get_artifacts(group_id, artifact_id, version, packaging, revision)
+            arts = self._get_artifacts(artifact_id, version, packaging, revision)
 
         # check if the revision is available
         if len(arts) == 0:
             raise ValueError(
-                'No such artifact: group_id=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
-                % (group_id, artifact_id, version, packaging, revision))
+                'No such artifact: driver=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
+                % (self.driver, artifact_id, version, packaging, revision))
         if len(arts) >= 2:
             raise ValueError(
                 'Found duplicated revision (index may be broken): '
-                'group_id=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
-                % (group_id, artifact_id, version, packaging, revision))
+                'driver=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
+                % (self.driver, artifact_id, version, packaging, revision))
         return arts[0]
 
     @classmethod
-    def _match_artifact(cls, artifact, group_id, artifact_id=None, version=None, packaging=None, revision=None):
-        return (artifact.basic_info.group_id == group_id
-                and (artifact_id is None or artifact.basic_info.artifact_id == artifact_id)
+    def _match_artifact(cls, artifact, artifact_id=None, version=None, packaging=None, revision=None):
+        return ((artifact_id is None or artifact.basic_info.artifact_id == artifact_id)
                 and (version is None or artifact.basic_info.version == version)
                 and (packaging is None or artifact.basic_info.packaging == packaging)
                 and (revision is None or artifact.basic_info.revision == revision))
 
-    def _get_artifacts(self, group_id, artifact_id=None, version=None, packaging=None, revision=None):
+    def _get_artifacts(self, artifact_id=None, version=None, packaging=None, revision=None):
         return [
-            x for x in self.artifacts if self._match_artifact(x, group_id, artifact_id, version, packaging, revision)
+            x for xs in self.artifacts.values() for x in xs
+            if self._match_artifact(x, artifact_id, version, packaging, revision)
         ]
 
-    def _del_artifacts(self, group_id, artifact_id, version, packaging, revision):
-        self.artifacts = [
-            x for x in self.artifacts if
-            not self._match_artifact(x, group_id, artifact_id, version, packaging, revision)
+    def _del_artifacts(self, artifact_id, version, packaging, revision):
+        self.artifacts[artifact_id] = [
+            x for x in self.artifacts[artifact_id]
+            if not self._match_artifact(x, artifact_id, version, packaging, revision)
         ]
 
-    def _get_latest_artifact(self, group_id, artifact_id, version, packaging):
-        ret = self._get_artifacts(group_id, artifact_id, version, packaging)
+    def _get_latest_artifact(self, artifact_id, version, packaging):
+        ret = self._get_artifacts(artifact_id, version, packaging)
         return [max(ret, key=lambda x: x.basic_info.revision)] if ret else []

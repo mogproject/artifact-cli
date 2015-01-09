@@ -72,19 +72,27 @@ class TestRepository(unittest.TestCase):
         ]
         self.maxDiff = None
 
+    def __mock_repo(self):
+        return Repository(MockDriver(), 'com.github.mogproject')
+
     def test_load(self):
-        r = Repository(MockDriver())
-        r.load()
-        self.assertEqual(r.artifacts, [])
+        r = self.__mock_repo()
+        r.load('art-test')
+        self.assertEqual(r.artifacts, {'art-test': []})
+
+    def test_load_all(self):
+        r = self.__mock_repo()
+        r.load_all()
+        self.assertEqual(r.artifacts, {})
 
     def test_save(self):
-        r = Repository(MockDriver())
-        r.artifacts += self.artifacts_for_test
-        r.save()
+        r = self.__mock_repo()
+        r.artifacts['art-test'] += self.artifacts_for_test
+        r.save('art-test')
 
-        r.artifacts = []
-        r.load()
-        self.assertEqual(r.artifacts, self.artifacts_for_test)
+        r.artifacts = {}
+        r.load_all()
+        self.assertEqual(r.artifacts, {'art-test': self.artifacts_for_test})
 
     #
     # upload
@@ -96,15 +104,10 @@ class TestRepository(unittest.TestCase):
                              GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                                      datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                                      '111122223333444455556666777788889999aaaa'))]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
 
-        self.assertEqual(r.artifacts, expected)
-
-        # assume artifact is automatically saved
-        r.artifacts = []
-        r.load()
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_upload_duplicated_artifact(self):
         expected = [Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
@@ -113,20 +116,20 @@ class TestRepository(unittest.TestCase):
                              GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                                      datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                                      '111122223333444455556666777788889999aaaa'))]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
 
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_upload_several_revisions(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        self.assertEqual(r.artifacts, [
+        self.assertEqual(r.artifacts, {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -151,15 +154,15 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
-        ])
+        ]})
 
     def test_upload_file_real_file(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', 'tests/resources/test-artifact-1.2.3.dat')
+        r = self.__mock_repo()
+        r.upload('tests/resources/test-artifact-1.2.3.dat')
 
-        self.assertEqual(len(r.artifacts), 1)
+        self.assertEqual(len(r.artifacts['test-artifact']), 1)
 
-        ret = r.artifacts[0]
+        ret = r.artifacts['test-artifact'][0]
         self.assertEqual(ret.basic_info, BasicInfo('com.github.mogproject', 'test-artifact', '1.2.3', 'dat', 1))
         self.assertEqual((ret.file_info.size, ret.file_info.md5), (11, '7a38cb250db7127113e00ad5e241d563'))
         self.assertFalse(ret.scm_info is None)
@@ -177,17 +180,17 @@ class TestRepository(unittest.TestCase):
                              GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                                      datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                                      '111122223333444455556666777788889999aaaa'))]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], force=True)
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], force=True)
 
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_upload_file_print_only(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], print_only=True)
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], print_only=True)
 
-        self.assertEqual(r.artifacts, [])
+        self.assertEqual(r.artifacts, {})
 
     def test_upload_file_force_print_only(self):
         expected = [Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
@@ -196,59 +199,58 @@ class TestRepository(unittest.TestCase):
                              GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                                      datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                                      '111122223333444455556666777788889999aaaa'))]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0],
-                 force=True, print_only=True)
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], force=True, print_only=True)
 
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     #
     # download
     #
     def test_download_specified_revision(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        r.download('com.github.mogproject', '/tmp/art-test-0.0.1.jar', 2)
+        r.download('/tmp/art-test-0.0.1.jar', 2)
         self.assertEqual(r.driver.downloaded_data, {
             '/tmp/art-test-0.0.1.jar': ('com.github.mogproject/art-test/0.0.1/2/art-test-0.0.1.jar',
                                         'ffffeeeeddddccccbbbbaaaa99998888')})
 
     def test_download_latest_revision(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        r.download('com.github.mogproject', '/tmp/art-test-0.0.1.jar', None)
+        r.download('/tmp/art-test-0.0.1.jar', None)
         self.assertEqual(r.driver.downloaded_data, {
             '/tmp/art-test-0.0.1.jar': ('com.github.mogproject/art-test/0.0.1/3/art-test-0.0.1.jar',
                                         'ffffeeeeddddccccbbbbaaaa99998888')})
 
     def test_download_print_only(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        r.download('com.github.mogproject', '/tmp/art-test-0.0.1.jar', 2, print_only=True)
-        r.download('com.github.mogproject', '/tmp/art-test-0.0.1.jar', None, print_only=True)
+        r.download('/tmp/art-test-0.0.1.jar', 2, print_only=True)
+        r.download('/tmp/art-test-0.0.1.jar', None, print_only=True)
         self.assertEqual(r.driver.downloaded_data, {})
 
     def test_download_no_such_revision(self):
-        r = Repository(MockDriver())
-        self.assertRaises(ValueError, r.download, 'com.github.mogproject', '/tmp/art-test-0.0.1.jar', None)
-        self.assertRaises(ValueError, r.download, 'com.github.mogproject', '/tmp/art-test-0.0.1.jar', 123)
+        r = self.__mock_repo()
+        self.assertRaises(ValueError, r.download, '/tmp/art-test-0.0.1.jar', None)
+        self.assertRaises(ValueError, r.download, '/tmp/art-test-0.0.1.jar', 123)
 
     def test_download_broken_index_error(self):
-        r = Repository(MockDriver())
-        r.artifacts = [
+        r = self.__mock_repo()
+        r.artifacts = {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 123),
                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -261,20 +263,20 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa')),
-        ]
-        self.assertRaises(ValueError, r.download, 'com.github.mogproject', '/tmp/art-test-0.0.1.jar', 123)
+        ]}
+        self.assertRaises(ValueError, r.download, '/tmp/art-test-0.0.1.jar', 123)
 
     #
     # delete
     #
     def test_delete_specified_revision(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 2)
+        r.delete('art-test-0.0.1.jar', 2)
         self.assertEqual(r.driver.uploaded_data, {
             'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
                 '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -304,47 +306,42 @@ class TestRepository(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
         ]
-        self.assertEqual(r.artifacts, expected)
-
-        # assume artifact is automatically saved
-        r.artifacts = []
-        r.load()
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_delete_revision_can_be_reused(self):
-        r = Repository(MockDriver())
+        r = self.__mock_repo()
 
         # [] -> [1] -> []
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 1)
-        self.assertEqual(r.artifacts, [])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.delete('art-test-0.0.1.jar', 1)
+        self.assertEqual(r.artifacts, {'art-test': []})
 
         # [] -> [1]
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        self.assertEqual(r.artifacts, [
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        self.assertEqual(r.artifacts, {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa')),
-        ])
+        ]})
 
         # [1] -> [1, 2] -> [2]
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 1)
-        self.assertEqual(r.artifacts, [
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.delete('art-test-0.0.1.jar', 1)
+        self.assertEqual(r.artifacts, {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
                      FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'second commit',
                              '111122223333444455556666777788889999aaaa')),
-        ])
+        ]})
 
         # [2] -> [2, 3]
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
-        self.assertEqual(r.artifacts, [
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        self.assertEqual(r.artifacts, {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
                      FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -358,12 +355,12 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
-        ])
+        ]})
 
         # [2, 3] -> [2] -> [2, 3]
-        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 3)
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
-        self.assertEqual(r.artifacts, [
+        r.delete('art-test-0.0.1.jar', 3)
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        self.assertEqual(r.artifacts, {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 2),
                      FileInfo('host1', 'user1', 22222, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -377,14 +374,14 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
-        ])
+        ]})
 
     def test_delete_revision_not_specified(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
         self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', None)
 
@@ -425,16 +422,16 @@ class TestRepository(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
         ]
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_delete_print_only(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        r.delete('com.github.mogproject', 'art-test-0.0.1.jar', 2, print_only=True)
+        r.delete('art-test-0.0.1.jar', 2, print_only=True)
         self.assertEqual(r.driver.uploaded_data, {
             'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
                 '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -472,15 +469,15 @@ class TestRepository(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'third commit',
                              '111122223333444455556666777788889999aaaa')),
         ]
-        self.assertEqual(r.artifacts, expected)
+        self.assertEqual(r.artifacts, {'art-test': expected})
 
     def test_delete_no_such_revision(self):
-        r = Repository(MockDriver())
-        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', 123)
+        r = self.__mock_repo()
+        self.assertRaises(ValueError, r.delete, 'art-test-0.0.1.jar', 123)
 
     def test_delete_broken_index_error(self):
-        r = Repository(MockDriver())
-        r.artifacts = [
+        r = self.__mock_repo()
+        r.artifacts = {'art-test': [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 123),
                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -493,25 +490,25 @@ class TestRepository(unittest.TestCase):
                      GitInfo('master', ['release 0.0.1'], 'mogproject', 'x@example.com',
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa')),
-        ]
-        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', 123)
+        ]}
+        self.assertRaises(ValueError, r.delete, 'art-test-0.0.1.jar', 123)
 
     #
     # print_list
     #
     def test_print_list_empty(self):
-        r = Repository(MockDriver())
-        r.print_list('com.github.mogproject')
+        r = self.__mock_repo()
+        r.print_list()
 
     def test_print_list_output_text(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[8])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[8])
         fp = StringIO()
-        r.print_list('com.github.mogproject', fp=fp)
+        r.print_list(fp=fp)
         self.assertEqual(fp.getvalue(), '\n'.join([
             'FILE                   #    SIZE      BUILD                 TAGS            SUMMARY        ',
             '-------------------------------------------------------------------------------------------',
@@ -524,12 +521,12 @@ class TestRepository(unittest.TestCase):
         fp.close()
 
     def test_print_list_output_text_long(self):
-        r = Repository(MockDriver())
+        r = self.__mock_repo()
         for i in range(15):
-            r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
-            r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
+            r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
+            r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
         fp = StringIO()
-        r.print_list('com.github.mogproject', fp=fp)
+        r.print_list(fp=fp)
         self.assertEqual(fp.getvalue(), '\n'.join([
             'FILE                   #    SIZE     BUILD                 TAGS            SUMMARY       ',
             '-----------------------------------------------------------------------------------------',
@@ -567,13 +564,13 @@ class TestRepository(unittest.TestCase):
         fp.close()
 
     def test_print_list_output_json(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
         fp = StringIO()
-        r.print_list('com.github.mogproject', output='json', fp=fp)
+        r.print_list(output='json', fp=fp)
         arts = [Artifact.from_dict(d) for d in json.loads(fp.getvalue())]
         self.assertEqual(arts, [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
@@ -604,12 +601,12 @@ class TestRepository(unittest.TestCase):
         fp.close()
 
     def test_print_list_output_json_long(self):
-        r = Repository(MockDriver())
+        r = self.__mock_repo()
         for i in range(15):
-            r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
-            r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
+            r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2], True)
+            r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0], True)
         fp = StringIO()
-        r.print_list('com.github.mogproject', output='json', fp=fp)
+        r.print_list(output='json', fp=fp)
         arts = [Artifact.from_dict(d) for d in json.loads(fp.getvalue())]
         self.assertEqual(arts, [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', i),
@@ -620,37 +617,40 @@ class TestRepository(unittest.TestCase):
                              '111122223333444455556666777788889999aaaa'))
             for i in range(1, 16)
         ] + [
-                             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
-                                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
-                                               'ffffeeeeddddccccbbbbaaaa99998888'),
-                                      GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
-                                              datetime(2014, 12, 30, 8, 11, 29), 'new version',
-                                              '111122223333444455556666777788889999aaaa'))
-                             for i in range(1, 16)
-                         ])
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa'))
+            for i in range(1, 16)
+        ])
         fp.close()
 
     def test_print_list_output_error(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject2', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
-        self.assertRaises(ValueError, r.print_list, 'com.github.mogproject', 'xxxx')
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r.save('art-test')
+
+        self.assertRaises(ValueError, r.print_list, 'xxxx')
 
     #
     # print_info
     #
     def test_print_info_output_text(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[4])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[5])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[6])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[7])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[4])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[5])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[6])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[7])
+        r.save('art-test')
 
         def f(file_name, revision):
             fp = StringIO()
-            r.print_info('com.github.mogproject', file_name, revision, fp=fp)
+            r.print_info(file_name, revision, fp=fp)
             ret = fp.getvalue()
             fp.close()
             return ret
@@ -663,15 +663,16 @@ class TestRepository(unittest.TestCase):
         self.assertEqual(f('art-test-0.0.2.jar', None), str(self.artifacts_for_test[6]) + '\n')
 
     def test_print_info_output_json(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[4])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[5])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[6])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[7])
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[4])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[5])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[6])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[7])
+        r.save('art-test')
 
         def f(file_name, revision):
             fp = StringIO()
-            r.print_info('com.github.mogproject', file_name, revision, output='json', fp=fp)
+            r.print_info(file_name, revision, output='json', fp=fp)
             ret = Artifact.from_dict(json.loads(fp.getvalue()))
             fp.close()
             return ret
@@ -684,9 +685,11 @@ class TestRepository(unittest.TestCase):
         self.assertEqual(f('art-test-0.0.2.jar', None), self.artifacts_for_test[6])
 
     def test_print_info_output_error(self):
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
-        r.upload('com.github.mogproject2', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
-        self.assertRaises(ValueError, r.print_info, 'com.github.mogproject', 'art-test-0.0.1.jar', None, 'xxxx')
+        r = self.__mock_repo()
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[0])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[1])
+        r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
+        r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
+        r.save('art-test')
+
+        self.assertRaises(ValueError, r.print_info, 'art-test-0.0.1.jar', None, 'xxxx')

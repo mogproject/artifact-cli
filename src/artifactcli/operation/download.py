@@ -1,4 +1,6 @@
+import logging
 from baseoperation import BaseOperation
+from artifactcli import BasicInfo
 
 
 class DownloadOperation(BaseOperation):
@@ -10,6 +12,12 @@ class DownloadOperation(BaseOperation):
 
     def run(self, repo):
         revision = None if self.revision == 'latest' else int(self.revision)
-        repo.load()
-        repo.download(self.group_id, self.local_path, revision, print_only=self.print_only)
+
+        try:
+            repo.load(BasicInfo.from_path(self.group_id, self.local_path).artifact_id)
+            repo.download(self.local_path, revision, print_only=self.print_only)
+        except ValueError as e:
+            logging.error(e)
+            return 2
+
         return 0
