@@ -160,11 +160,16 @@ your-bucket-name
 └── group.id.2
     ├── .meta
     │   └── index-awesome-project.json 
-     └── awesome-project            // completely separated to the group.id.1's artifact
+    └── awesome-project                 // completely separated to the group.id.1's artifact
         └── 0.0.1
             └── 1
                 └── awesome-project-0.0.1.zip
 ```
+
+### Notes
+
+- This tool supports only artifact-id-level concurrency.
+    - Simultaneous uploading of the artifacts with same artifact id could let repository broken.
 
 
 ### Uninstallation
@@ -172,3 +177,5 @@ your-bucket-name
 ```
 pip uninstall artifact-cli
 ```
+
+(may need ```sudo````)
