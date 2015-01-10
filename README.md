@@ -178,4 +178,4 @@ your-bucket-name
 pip uninstall artifact-cli
 ```
 
-(may need ```sudo````)
+(may need ```sudo```)
