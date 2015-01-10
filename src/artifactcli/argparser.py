@@ -1,6 +1,6 @@
 from optparse import OptionParser
 
-VERSION = 'artifact-cli 0.1.0'
+VERSION = 'artifact-cli 0.1.1'
 USAGE = """
   %prog [options] list     GROUP
   %prog [options] upload   GROUP LOCAL_PATH
