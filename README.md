@@ -3,6 +3,7 @@ artifact-cli
 
 Private Artifact Manager using Amazon S3
 
+[![PyPI version](https://badge.fury.io/py/artifact-cli.svg)](http://badge.fury.io/py/artifact-cli)
 [![Build Status](https://travis-ci.org/mogproject/artifact-cli.svg?branch=master)](https://travis-ci.org/mogproject/artifact-cli)
 [![Coverage Status](https://img.shields.io/coveralls/mogproject/artifact-cli.svg)](https://coveralls.io/r/mogproject/artifact-cli?branch=master)
 [![Stories in Ready](https://badge.waffle.io/mogproject/artifact-cli.png?label=ready&title=Ready)](https://waffle.io/mogproject/artifact-cli)
