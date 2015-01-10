@@ -55,4 +55,8 @@ def get_parser():
         '--region', dest='region', default=None, type='string',
         help='Amazon S3 region name (default: us-east-1)'
     )
+    parser.add_option(
+        '--debug', action='store_true', dest='debug', default=False,
+        help='enables debug logging'
+    )
     return parser

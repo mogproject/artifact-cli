@@ -14,11 +14,7 @@ class InfoOperation(BaseOperation):
         revision = None if self.revision == 'latest' else int(self.revision)
 
         try:
-            # load index for artifact id (suppressing logging)
-            logging.getLogger().disabled = True
             repo.load(BasicInfo.from_path(self.group_id, self.file_name).artifact_id)
-            logging.getLogger().disabled = False
-
             repo.print_info(self.file_name, revision, self.output)
         except ValueError as e:
             logging.warn(e)

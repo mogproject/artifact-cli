@@ -61,7 +61,7 @@ class S3Driver(BaseDriver):
         :return: index json text in unicode
         """
         index_path = self.index_path(artifact_id)
-        logging.info('Reading index: %s' % self.s3_url(self.bucket_name, index_path))
+        logging.debug('Reading index: %s' % self.s3_url(self.bucket_name, index_path))
         k = self.bucket().get_key(index_path)
         if k:
             s = k.get_contents_as_string(encoding='utf-8')
@@ -81,7 +81,7 @@ class S3Driver(BaseDriver):
         assert_type(s, unicode)
 
         index_path = self.index_path(artifact_id)
-        logging.info('Writing index: %s' % self.s3_url(self.bucket_name, index_path))
+        logging.debug('Writing index: %s' % self.s3_url(self.bucket_name, index_path))
         k = Key(self.bucket())
         k.key = index_path
         k.set_metadata('Content-Type', 'application/json; charset=utf-8')
