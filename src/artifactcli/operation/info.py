@@ -1,5 +1,6 @@
 import logging
 from baseoperation import BaseOperation
+from artifactcli import BasicInfo
 
 
 class InfoOperation(BaseOperation):
@@ -12,13 +13,9 @@ class InfoOperation(BaseOperation):
     def run(self, repo):
         revision = None if self.revision == 'latest' else int(self.revision)
 
-        # suppress logging
-        logging.getLogger().disabled = True
-        repo.load()
-        logging.getLogger().disabled = False
-
         try:
-            repo.print_info(self.group_id, self.file_name, revision, self.output)
+            repo.load(BasicInfo.from_path(self.group_id, self.file_name).artifact_id)
+            repo.print_info(self.file_name, revision, self.output)
         except ValueError as e:
             logging.warn(e)
             return 2

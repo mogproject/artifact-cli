@@ -1,6 +1,6 @@
 from optparse import OptionParser
 
-VERSION = 'artifact-cli 0.0.5'
+VERSION = 'artifact-cli 0.1.0'
 USAGE = """
   %prog [options] list     GROUP
   %prog [options] upload   GROUP LOCAL_PATH
@@ -54,5 +54,9 @@ def get_parser():
     parser.add_option(
         '--region', dest='region', default=None, type='string',
         help='Amazon S3 region name (default: us-east-1)'
+    )
+    parser.add_option(
+        '--debug', action='store_true', dest='debug', default=False,
+        help='enables debug logging'
     )
     return parser

@@ -1,4 +1,6 @@
+import logging
 from baseoperation import BaseOperation
+from artifactcli import BasicInfo
 
 
 class DeleteOperation(BaseOperation):
@@ -10,6 +12,14 @@ class DeleteOperation(BaseOperation):
 
     def run(self, repo):
         revision = int(self.revision)
-        repo.load()
-        repo.delete(self.group_id, self.file_name, revision, print_only=self.print_only)
+
+        try:
+            artifact_id = BasicInfo.from_path(self.group_id, self.file_name).artifact_id
+            repo.load(artifact_id)
+            repo.delete(self.file_name, revision, print_only=self.print_only)
+            repo.save(artifact_id)
+        except ValueError as e:
+            logging.warn(e)
+            return 2
+
         return 0

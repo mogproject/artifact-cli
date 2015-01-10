@@ -1,5 +1,4 @@
 from unicodedata import east_asian_width
-from asserttype import assert_type
 
 
 def to_str(s, encoding='utf-8'):

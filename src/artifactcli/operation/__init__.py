@@ -1,4 +1,11 @@
-__all__ = ['HelpOperation', 'ListOperation', 'UploadOperation', 'DownloadOperation', 'InfoOperation', 'DeleteOperation']
+__all__ = [
+    'HelpOperation',
+    'ListOperation',
+    'UploadOperation',
+    'DownloadOperation',
+    'InfoOperation',
+    'DeleteOperation',
+]
 from .help import HelpOperation
 from .list import ListOperation
 from .upload import UploadOperation
@@ -11,7 +18,6 @@ def make(command, group_id, args, options):
     """
     Generate operation class from arguments.
     :param command: command string
-    :param group_id: group id
     :param args: list of argument
     :param options: dict of options
     :return: Raise AssertionError when failure

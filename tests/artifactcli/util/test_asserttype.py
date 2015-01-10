@@ -8,5 +8,5 @@ class TestAssertType(unittest.TestCase):
         self.assertEqual(assert_type('abc', str), 'abc')
 
     def test_assert_type_error(self):
-        self.assertRaises(AssertionError, assert_type, 123, str)
-        self.assertRaises(AssertionError, assert_type, 'abc', int)
+        self.assertRaises(TypeError, assert_type, 123, str)
+        self.assertRaises(TypeError, assert_type, 'abc', int)

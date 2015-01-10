@@ -21,7 +21,9 @@ class Settings(CaseClass):
         operation = operation or HelpOperation(self.parser)
 
         # set log level and format
-        logging.basicConfig(level=log_level, format='[%(levelname)s] %(message)s')
+        if options and options['debug']:
+            log_level = logging.DEBUG
+            logging.basicConfig(level=log_level, format='[%(levelname)s] %(message)s')
 
         # set parameters
         self.log_level = log_level
@@ -89,7 +91,7 @@ class Settings(CaseClass):
 
         # set repository driver
         driver = S3Driver(access_key, secret_key, bucket, group_id, region)
-        repo = Repository(driver)
+        repo = Repository(driver, group_id)
         return Settings(self.log_level, self.operation, self.options, repo)
 
     @classmethod

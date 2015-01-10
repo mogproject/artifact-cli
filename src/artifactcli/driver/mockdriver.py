@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from basedriver import BaseDriver
 from artifactcli.util import assert_type
 
@@ -10,23 +11,28 @@ class MockDriver(BaseDriver):
 
     def __init__(self):
         super(MockDriver, self).__init__(['index_data', 'uploaded_data', 'downloaded_data'])
-        self.index_data = u''
+        self.index_data = defaultdict(unicode)
         self.uploaded_data = {}
         self.downloaded_data = {}
 
-    def read_index(self):
+    def artifact_ids(self):
+        return sorted(self.index_data.keys())
+
+    def read_index(self, artifact_id):
         """
+        :param artifact_id: artifact id to read
         :return: index json text in unicode
         """
-        return assert_type(self.index_data.decode('utf-8'), unicode)
+        return assert_type(self.index_data[artifact_id].decode('utf-8'), unicode)
 
-    def write_index(self, s):
+    def write_index(self, artifact_id, s):
         """
+        :param artifact_id: artifact id to write
         :param s: index json text in unicode
         :return: None
         """
         assert_type(s, unicode)
-        self.index_data = s.encode('utf-8')
+        self.index_data[artifact_id] = s.encode('utf-8')
 
     def upload(self, local_path, remote_path, md5):
         if md5 is None:

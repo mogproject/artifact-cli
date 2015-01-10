@@ -1,14 +1,15 @@
 import unittest
 from copy import copy
 from StringIO import StringIO
+import logging
 from artifactcli import *
 
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'region': None,
+        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'region': None, 'debug': False,
                              'print_only': False, 'secret_key': None, 'config': '~/.artifact-cli', 'output': None}
-        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'region': None,
+        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'region': None, 'debug': True,
                           'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None}
 
     def _updated_opts(self, updates):
@@ -18,6 +19,7 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_empty(self):
         self.assertEqual(Settings().parse_args(['art']), Settings())
+        self.assertEqual(Settings().log_level, logging.INFO)
 
     def test_parse_args_list(self):
         s = Settings().parse_args(['art', 'list', 'gid'])
@@ -26,8 +28,9 @@ class TestSettings(unittest.TestCase):
     def test_parse_args_list_full(self):
         s = Settings().parse_args(
             ['art', 'list', 'gid', '--config', 'xxx', '--check', '--force', '--access', 'ACCESS_KEY', '--secret',
-             'SECRET_KEY', '--bucket', 'BUCKET'])
+             'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
         self.assertEqual(s, Settings(operation=ListOperation('gid', []), options=self.full_opts))
+        self.assertEqual(s.log_level, logging.DEBUG)
 
     def test_parse_args_list_error(self):
         self.assertEqual(Settings().parse_args(['art', 'list']), Settings())
@@ -40,7 +43,7 @@ class TestSettings(unittest.TestCase):
     def test_parse_args_upload_full(self):
         s = Settings().parse_args(
             ['art', 'upload', 'gid', '/path/to/xxx', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
         self.assertEqual(s, Settings(operation=UploadOperation('gid', ['/path/to/xxx'], True, True),
                                      options=self.full_opts))
 
@@ -50,25 +53,25 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_download(self):
         s = Settings().parse_args(['art', 'download', 'gid', '/path/to/xxx', '123'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', '123'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', '123'], False),
+                                     options=self.default_opts))
 
         s = Settings().parse_args(['art', 'download', 'gid', '/path/to/xxx', 'latest'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', 'latest'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', 'latest'], False),
+                                     options=self.default_opts))
 
     def test_parse_args_download_full(self):
         s = Settings().parse_args(
             ['art', 'download', 'gid', '/path/to/xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', '123'], True), options=self.full_opts))
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', '123'], True),
+                                     options=self.full_opts))
 
         s = Settings().parse_args(
             ['art', 'download', 'gid', '/path/to/xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DownloadOperation(
-            'gid', ['/path/to/xxx', 'latest'], True), options=self.full_opts))
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
+        self.assertEqual(s, Settings(operation=DownloadOperation('gid', ['/path/to/xxx', 'latest'], True),
+                                     options=self.full_opts))
 
     def test_parse_args_download_error(self):
         self.assertEqual(Settings().parse_args(['art', 'download']), Settings())
@@ -82,37 +85,36 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_info(self):
         s = Settings().parse_args(['art', 'info', 'gid', 'xxx', '123'])
-        self.assertEqual(s, Settings(operation=InfoOperation(
-            'gid', ['xxx', '123'], None), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', '123'], None), options=self.default_opts))
 
         s = Settings().parse_args(['art', 'info', 'gid', 'xxx', 'latest'])
-        self.assertEqual(s, Settings(operation=InfoOperation(
-            'gid', ['xxx', 'latest'], None), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], None),
+                                     options=self.default_opts))
 
     def test_parse_args_info_full(self):
         s = Settings().parse_args(
             ['art', 'info', 'gid', 'xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--output', 'text'])
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--output', 'text', '--debug'])
         o = self._updated_opts({
             'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
             'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx',
-            'output': 'text'})
+            'output': 'text', 'debug': True})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', '123'], 'text'), options=o))
 
         s = Settings().parse_args(
             ['art', 'info', 'gid', 'xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
         o = self._updated_opts({
             'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
-            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None})
+            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None, 'debug': True})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], None), options=o))
 
         s = Settings().parse_args(
             ['art', 'info', 'gid', 'xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--output', 'json'])
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--output', 'json', '--debug'])
         o = self._updated_opts({
             'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
-            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': 'json'})
+            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': 'json', 'debug': True})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], 'json'), options=o))
 
     def test_parse_args_info_error(self):
@@ -127,15 +129,15 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_delete(self):
         s = Settings().parse_args(['art', 'delete', 'gid', 'xxx', '123'])
-        self.assertEqual(s, Settings(operation=DeleteOperation(
-            'gid', ['xxx', '123'], False), options=self.default_opts))
+        self.assertEqual(s, Settings(operation=DeleteOperation('gid', ['xxx', '123'], False),
+                                     options=self.default_opts))
 
     def test_parse_args_delete_full(self):
         s = Settings().parse_args(
             ['art', 'delete', 'gid', 'xxx', '123', '--config', 'xxx', '--check', '--force', '--access',
-             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET'])
-        self.assertEqual(s, Settings(operation=DeleteOperation(
-            'gid', ['xxx', '123'], True), options=self.full_opts))
+             'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
+        self.assertEqual(s, Settings(operation=DeleteOperation('gid', ['xxx', '123'], True),
+                                     options=self.full_opts))
 
     def test_parse_args_delete_error(self):
         self.assertEqual(Settings().parse_args(['art', 'delete']), Settings())
@@ -176,7 +178,7 @@ class TestSettings(unittest.TestCase):
             operation=ListOperation('gid', []),
             options=self._updated_opts(
                 {'access_key': 'ACCESS_KEY', 'secret_key': 'SECRET_KEY', 'bucket': 'BUCKET'}),
-            repo=Repository(S3Driver('ACCESS_KEY', 'SECRET_KEY', 'BUCKET', 'gid'))
+            repo=Repository(S3Driver('ACCESS_KEY', 'SECRET_KEY', 'BUCKET', 'gid'), 'gid')
         )
         self.assertEqual(s.load_config(), t)
 
@@ -199,7 +201,7 @@ class TestSettings(unittest.TestCase):
         t = Settings(
             operation=ListOperation('gid', []),
             options=self._updated_opts({'config': 'tests/resources/test-artifact-cli.conf', 'bucket': 'bucket4art'}),
-            repo=Repository(S3Driver('XXX', 'YYY', 'bucket4art', 'gid'))
+            repo=Repository(S3Driver('XXX', 'YYY', 'bucket4art', 'gid'), 'gid')
         )
         self.assertEqual(s.load_config(), t)
 

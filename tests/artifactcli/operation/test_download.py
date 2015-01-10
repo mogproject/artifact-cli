@@ -25,22 +25,22 @@ class TestDownloadOperation(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa')),
         ]
-        r = Repository(MockDriver())
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', arts[0])
-        r.upload('com.github.mogproject', '/path/to/art-test-0.0.1.jar', arts[1])
+        r = Repository(MockDriver(), 'com.github.mogproject')
+        r.upload('/path/to/art-test-0.0.1.jar', arts[0])
+        r.upload('/path/to/art-test-0.0.1.jar', arts[1])
+        r.save('art-test')
 
-        r.artifacts = []
+        print(r.artifacts)
+        r.artifacts = {}
 
-        rc = DownloadOperation(
-            'com.github.mogproject', ['/tmp/art-test-0.0.1.jar', 'latest'], False).run(r)
+        rc = DownloadOperation('com.github.mogproject', ['/tmp/art-test-0.0.1.jar', 'latest'], False).run(r)
         self.assertEqual(rc, 0)
 
         self.assertEqual(r.driver.downloaded_data, {
             '/tmp/art-test-0.0.1.jar': ('com.github.mogproject/art-test/0.0.1/2/art-test-0.0.1.jar',
                                         'ffffeeeeddddccccbbbbaaaa99998887')})
 
-        rc = DownloadOperation(
-            'com.github.mogproject', ['/tmp/1/art-test-0.0.1.jar', '1'], False).run(r)
+        rc = DownloadOperation('com.github.mogproject', ['/tmp/1/art-test-0.0.1.jar', '1'], False).run(r)
         self.assertEqual(rc, 0)
 
         self.assertEqual(r.driver.downloaded_data, {
@@ -48,3 +48,8 @@ class TestDownloadOperation(unittest.TestCase):
                                         'ffffeeeeddddccccbbbbaaaa99998887'),
             '/tmp/1/art-test-0.0.1.jar': ('com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar',
                                           'ffffeeeeddddccccbbbbaaaa99998888')})
+
+    def test_run_error(self):
+        r = Repository(MockDriver(), 'com.github.mogproject')
+        rc = DownloadOperation('com.github.mogproject', ['/tmp/art-test-0.0.1.jar', '1'], False).run(r)
+        self.assertEqual(rc, 2)

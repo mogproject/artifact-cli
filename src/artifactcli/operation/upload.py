@@ -1,4 +1,5 @@
 from baseoperation import BaseOperation
+from artifactcli import BasicInfo
 
 
 class UploadOperation(BaseOperation):
@@ -7,6 +8,8 @@ class UploadOperation(BaseOperation):
         self.local_path = self._get_arg(0, 'LOCAL_PATH')
 
     def run(self, repo):
-        repo.load()
-        repo.upload(self.group_id, self.local_path, force=self.force, print_only=self.print_only)
+        artifact_id = BasicInfo.from_path(self.group_id, self.local_path).artifact_id
+        repo.load(artifact_id)
+        repo.upload(self.local_path, force=self.force, print_only=self.print_only)
+        repo.save(artifact_id)
         return 0
