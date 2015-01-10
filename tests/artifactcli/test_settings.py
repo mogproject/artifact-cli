@@ -211,12 +211,12 @@ class TestSettings(unittest.TestCase):
 
     def test_read_aws_config_empty(self):
         s = StringIO('')
-        self.assertEqual(Settings._read_aws_config(s, ''), (None, None, None))
+        self.assertEqual(Settings._read_aws_config(s, ''), (None, None, None, None))
 
     def test_read_aws_config_default_some(self):
         s = StringIO("""[default]\naws_access_key_id = abcdefghijklmnopqrstuvwxyz""")
         self.assertEqual(Settings._read_aws_config(s, 'mogproject'),
-                         ('abcdefghijklmnopqrstuvwxyz', None, None))
+                         ('abcdefghijklmnopqrstuvwxyz', None, None, None))
 
     def test_read_aws_config_default_full(self):
         s = StringIO('\n'.join([
@@ -227,7 +227,7 @@ class TestSettings(unittest.TestCase):
             'region= ap-northeast-1',
         ]))
         self.assertEqual(Settings._read_aws_config(s, 'mogproject'),
-                         ('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'bucket-name'))
+                         ('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'bucket-name', 'ap-northeast-1'))
 
     def test_read_aws_config_non_default_full(self):
         s = StringIO('\n'.join([
@@ -235,13 +235,15 @@ class TestSettings(unittest.TestCase):
             'aws_access_key_id = abcdefghijklmnopqrstuvwxyz',
             'aws_secret_access_key=ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'bucket = bucket-name',
+            'region= ap-northeast-1',
             '[my.group.id]',
             'aws_access_key_id = zyxwvutsrqponmlkjihgfedcba',
             'aws_secret_access_key=ZYXWVUTSRQPONMLKJIHGFEDCBA',
             'bucket = bucket-name-123',
+            'region= us-west-1',
         ]))
         self.assertEqual(Settings._read_aws_config(s, 'my.group.id'),
-                         ('zyxwvutsrqponmlkjihgfedcba', 'ZYXWVUTSRQPONMLKJIHGFEDCBA', 'bucket-name-123'))
+                         ('zyxwvutsrqponmlkjihgfedcba', 'ZYXWVUTSRQPONMLKJIHGFEDCBA', 'bucket-name-123', 'us-west-1'))
 
     def test_read_config_fallback(self):
         s = StringIO('\n'.join([
@@ -255,4 +257,4 @@ class TestSettings(unittest.TestCase):
             'bucket = bucket-name-123',
         ]))
         self.assertEqual(Settings._read_aws_config(s, 'mogproject'),
-                         ('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'bucket-name'))
+                         ('abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'bucket-name', None))
