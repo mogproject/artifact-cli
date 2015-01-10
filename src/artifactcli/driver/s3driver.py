@@ -18,7 +18,7 @@ class S3Driver(BaseDriver):
 
     def __init__(self, aws_access_key, aws_secret_key, bucket_name, group_id,
                  region=None, index_prefix=None, connection=None):
-        super(S3Driver, self).__init__(['aws_access_key', 'aws_secret_key', 'bucket_name', 'region', 'index_prefix'])
+        super(S3Driver, self).__init__(['aws_access_key', 'bucket_name', 'region', 'index_prefix'])
         self.aws_access_key = aws_access_key
         self.aws_secret_key = aws_secret_key
         self.bucket_name = bucket_name

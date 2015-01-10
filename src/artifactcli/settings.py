@@ -73,10 +73,11 @@ class Settings(CaseClass):
 
             try:
                 with open(path) as fp:
-                    a, s, b = self._read_aws_config(fp, group_id)
+                    a, s, b, r = self._read_aws_config(fp, group_id)
                     access_key = a if access_key is None else access_key
                     secret_key = s if secret_key is None else secret_key
                     bucket = b if bucket is None else bucket
+                    region = r if region is None else region
             except IOError:
                 logging.error('Failed to open configuration file: %s' % config)
                 return Settings(self.log_level)
@@ -112,5 +113,6 @@ class Settings(CaseClass):
         access_key = f('aws_access_key_id')
         secret_key = f('aws_secret_access_key')
         bucket = f('bucket')
+        region = f('region')
 
-        return access_key, secret_key, bucket
+        return access_key, secret_key, bucket, region

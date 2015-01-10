@@ -1,6 +1,6 @@
 from optparse import OptionParser
 
-VERSION = 'artifact-cli 0.1.1'
+VERSION = 'artifact-cli 0.1.2'
 USAGE = """
   %prog [options] list     GROUP
   %prog [options] upload   GROUP LOCAL_PATH
@@ -57,6 +57,6 @@ def get_parser():
     )
     parser.add_option(
         '--debug', action='store_true', dest='debug', default=False,
-        help='enables debug logging'
+        help='enables debug level logging'
     )
     return parser
