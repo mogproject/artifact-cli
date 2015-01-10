@@ -99,7 +99,7 @@ class Repository(CaseClass):
         :param print_only:
         :return: None
         """
-        art = self.get_artifact_from_path(local_path, revision)
+        art = self._get_artifact_from_path(local_path, revision)
 
         # download file
         if print_only:
@@ -121,7 +121,7 @@ class Repository(CaseClass):
         """
         if revision is None:
             raise ValueError('Revision should be specified to delete.')
-        art = self.get_artifact_from_path(file_name, revision)
+        art = self._get_artifact_from_path(file_name, revision)
         bi = art.basic_info
 
         # delete file
@@ -168,7 +168,7 @@ class Repository(CaseClass):
 
     def print_info(self, file_name, revision=None, output=None, fp=sys.stdout):
         output = output or 'text'
-        art = self.get_artifact_from_path(file_name, revision)
+        art = self._get_artifact_from_path(file_name, revision)
 
         if output == 'text':
             s = str(art)
@@ -178,7 +178,7 @@ class Repository(CaseClass):
             raise ValueError('Unknown output format: %s' % output)
         fp.write(to_str(s) + '\n')
 
-    def get_artifact_from_path(self, path, revision=None):
+    def _get_artifact_from_path(self, path, revision=None):
         bi = BasicInfo.from_path(self.group_id, path)
         return self._get_artifact(bi.artifact_id, bi.version, bi.packaging, revision)
 

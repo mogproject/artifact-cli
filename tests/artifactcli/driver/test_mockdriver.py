@@ -7,6 +7,18 @@ class TestMockDriver(unittest.TestCase):
     def setUp(self):
         pass
 
+    def test_get_artifact_ids_empty(self):
+        self.assertEqual(MockDriver().artifact_ids(), [])
+
+    def test_get_artifact_ids(self):
+        m = MockDriver()
+        m.write_index('test-artifact', u'')
+        m.write_index('test-artifact123', u'')
+        m.write_index('test-artifact10', u'')
+        m.write_index('test-artifact11', u'')
+
+        self.assertEqual(m.artifact_ids(), ['test-artifact', 'test-artifact10', 'test-artifact11', 'test-artifact123'])
+
     def test_read_index(self):
         # read empty
         m = MockDriver()

@@ -17,6 +17,20 @@ class TestS3Driver(unittest.TestCase):
         return S3Driver('XXX', 'YYY', 'bucket4art', 'gid', connection=conn)
 
     @mock_s3
+    def test_get_artifact_ids_empty(self):
+        self.assertEqual(self._get_driver().artifact_ids(), [])
+
+    @mock_s3
+    def test_get_artifact_ids(self):
+        d = self._get_driver()
+        d.write_index('test-artifact', u'')
+        d.write_index('test-artifact123', u'')
+        d.write_index('test-artifact10', u'')
+        d.write_index('test-artifact11', u'')
+
+        self.assertEqual(d.artifact_ids(), ['test-artifact', 'test-artifact10', 'test-artifact11', 'test-artifact123'])
+
+    @mock_s3
     def test_write_index(self):
         self._get_driver().write_index('test-artifact', u'[{json: "message"}]')
 

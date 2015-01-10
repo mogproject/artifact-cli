@@ -48,3 +48,8 @@ class TestDownloadOperation(unittest.TestCase):
                                         'ffffeeeeddddccccbbbbaaaa99998887'),
             '/tmp/1/art-test-0.0.1.jar': ('com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar',
                                           'ffffeeeeddddccccbbbbaaaa99998888')})
+
+    def test_run_error(self):
+        r = Repository(MockDriver(), 'com.github.mogproject')
+        rc = DownloadOperation('com.github.mogproject', ['/tmp/art-test-0.0.1.jar', '1'], False).run(r)
+        self.assertEqual(rc, 2)

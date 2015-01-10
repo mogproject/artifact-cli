@@ -38,3 +38,8 @@ class TestDeleteOperation(unittest.TestCase):
             'com.github.mogproject/art-test/0.0.1/2/art-test-0.0.1.jar': (
                 '/path/to/art-test-0.0.1.jar', 'ffffeeeeddddccccbbbbaaaa99998887'),
         })
+
+    def test_run_error(self):
+        r = Repository(MockDriver(), 'com.github.mogproject')
+        rc = DeleteOperation('com.github.mogproject', ['/tmp/art-test-0.0.1.jar', '1'], False).run(r)
+        self.assertEqual(rc, 2)

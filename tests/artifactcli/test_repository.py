@@ -383,7 +383,7 @@ class TestRepository(unittest.TestCase):
         r.upload('/path/to/art-test-0.0.2.jar', self.artifacts_for_test[2])
         r.upload('/path/to/art-test-0.0.1.jar', self.artifacts_for_test[3])
 
-        self.assertRaises(ValueError, r.delete, 'com.github.mogproject', 'art-test-0.0.1.jar', None)
+        self.assertRaises(ValueError, r.delete, 'art-test-0.0.1.jar', None)
 
         self.assertEqual(r.driver.uploaded_data, {
             'com.github.mogproject/art-test/0.0.1/1/art-test-0.0.1.jar': (
