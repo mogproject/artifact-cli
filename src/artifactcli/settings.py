@@ -20,16 +20,18 @@ class Settings(CaseClass):
         # fallback operation
         operation = operation or HelpOperation(self.parser)
 
-        # set log level and format
-        if options and options['debug']:
-            log_level = logging.DEBUG
-            logging.basicConfig(level=log_level, format='[%(levelname)s] %(message)s')
-
         # set parameters
-        self.log_level = log_level
+        self.log_level = logging.DEBUG if options and options['debug'] else log_level
         self.operation = operation
         self.repo = repo
         self.options = options
+
+    def set_logging(self):
+        """
+        Setup logging settings
+        """
+        logging.basicConfig(level=self.log_level, format='[%(levelname)s] %(message)s')
+        return self
 
     def parse_args(self, argv):
         """
