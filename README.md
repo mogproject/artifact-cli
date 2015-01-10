@@ -137,7 +137,7 @@ The structure of the paths is the following.
 your-bucket-name
 ├── group.id.1                          // group ID
 │   ├── .meta                           // meta data directory for each group
-│   │   ├── index-awesome-project.json  // index data is written as JSON for each artifact id
+│   │   ├── index-awesome-project.json  // index data is written as JSON for each artifact ID
 │   │   └── index-play-project.json
 │   ├── awesome-project                 // artifact ID
 │   │   ├── 0.0.1                       // version
