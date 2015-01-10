@@ -26,7 +26,7 @@ class Settings(CaseClass):
         self.repo = repo
         self.options = options
 
-    def set_logging(self):
+    def configure_logging(self):
         """
         Setup logging settings
         """
