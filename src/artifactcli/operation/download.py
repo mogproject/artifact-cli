@@ -1,6 +1,6 @@
 import logging
 from baseoperation import BaseOperation
-from artifactcli import BasicInfo
+from artifactcli.artifact import BasicInfo
 
 
 class DownloadOperation(BaseOperation):

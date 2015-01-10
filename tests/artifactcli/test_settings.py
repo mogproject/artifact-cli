@@ -2,7 +2,11 @@ import unittest
 from copy import copy
 from StringIO import StringIO
 import logging
-from artifactcli import *
+
+from artifactcli.driver import *
+from artifactcli.operation import *
+from artifactcli.repository import Repository
+from artifactcli.settings import Settings
 
 
 class TestSettings(unittest.TestCase):

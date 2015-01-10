@@ -1,8 +1,18 @@
 from setuptools import setup, find_packages
 
+SRC_DIR = 'src'
+
+
+def get_version():
+    import sys
+
+    sys.path.append(SRC_DIR)
+    return __import__('artifactcli').__version__
+
+
 setup(
     name='artifact-cli',
-    version='0.1.2',
+    version=get_version(),
     description='Private Artifact Manager using Amazon S3',
     author='mogproject',
     author_email='mogproj@gmail.com',
@@ -16,8 +26,8 @@ setup(
     tests_require=[
         'moto',
     ],
-    package_dir={'': 'src'},
-    packages=find_packages('src'),
+    package_dir={'': SRC_DIR},
+    packages=find_packages(SRC_DIR),
     include_package_data=True,
     test_suite='tests',
     entry_points="""

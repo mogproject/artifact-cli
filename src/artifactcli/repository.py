@@ -191,12 +191,12 @@ class Repository(CaseClass):
         # check if the revision is available
         if len(arts) == 0:
             raise ValueError(
-                'No such artifact: driver=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
+                'No such artifact: driver=%s, artifact_id=%r, version=%r, packaging=%r, revision=%r'
                 % (self.driver, artifact_id, version, packaging, revision))
         if len(arts) >= 2:
             raise ValueError(
                 'Found duplicated revision (index may be broken): '
-                'driver=%s, artifact_id=%s, version=%s, packaging=%s, revision=%s'
+                'driver=%s, artifact_id=%r, version=%r, packaging=%r, revision=%r'
                 % (self.driver, artifact_id, version, packaging, revision))
         return arts[0]
 
