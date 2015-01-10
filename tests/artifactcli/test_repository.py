@@ -5,7 +5,9 @@ from datetime import datetime
 from StringIO import StringIO
 import json
 
-from artifactcli import *
+from artifactcli.artifact import *
+from artifactcli.driver import *
+from artifactcli.repository import Repository
 
 
 class TestRepository(unittest.TestCase):

@@ -1,6 +1,10 @@
 import unittest
 from datetime import datetime
-from artifactcli import *
+
+from artifactcli.artifact import *
+from artifactcli.driver import *
+from artifactcli.operation import *
+from artifactcli.repository import Repository
 
 
 class TestInfoOperation(unittest.TestCase):
