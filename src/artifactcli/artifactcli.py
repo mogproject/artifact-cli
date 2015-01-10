@@ -7,4 +7,4 @@ def main():
     Main function
     """
     settings = Settings().parse_args(sys.argv).load_config()
-    return settings.operation.run(settings.repo)
+    return settings.set_logging().operation.run(settings.repo)
