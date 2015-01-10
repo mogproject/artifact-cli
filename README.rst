@@ -17,13 +17,13 @@ Private Artifact Manager using Amazon S3
    :target: https://coveralls.io/r/mogproject/artifact-cli?branch=master
    :alt: Coverage Status
 
-.. image:: https://badge.waffle.io/mogproject/artifact-cli.svg?label=ready&title=Ready
-   :target: https://waffle.io/mogproject/artifact-cli
-   :alt: 'Stories in Ready' 
-
 .. image:: https://img.shields.io/badge/license-Apache%202.0-blue.svg
    :target: http://choosealicense.com/licenses/apache-2.0/
    :alt: License
+
+.. image:: https://badge.waffle.io/mogproject/artifact-cli.svg?label=ready&title=Ready
+   :target: https://waffle.io/mogproject/artifact-cli
+   :alt: 'Stories in Ready' 
 
 --------
 Features
