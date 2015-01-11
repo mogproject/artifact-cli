@@ -5,7 +5,7 @@ import boto.s3
 from boto.s3.key import Key
 from boto.s3.connection import OrdinaryCallingFormat
 from basedriver import BaseDriver
-from artifactcli.util import assert_type
+from artifactcli.util import assert_type, ProgressBar
 
 DEFAULT_REGION = 'us-east-1'
 DEFAULT_INDEX_PREFIX = '.meta/index-'
@@ -99,11 +99,15 @@ class S3Driver(BaseDriver):
         """
         k = Key(self.bucket())
         k.key = remote_path
-        logging.info('Uploading file: %s' % self.s3_url(self.bucket_name, remote_path))
-        k.set_contents_from_filename(local_path)
+
+        with ProgressBar():
+            k.set_contents_from_filename(local_path)
+
         remote_md5 = self.bucket().get_key(remote_path).etag.strip('"')
         assert md5 is None or md5 == remote_md5, \
             'Failed to check MD5 digest: local=%s, remote=%s' % (md5, remote_md5)
+
+        logging.info('Uploaded: %s' % self.s3_url(self.bucket_name, remote_path))
 
     def download(self, remote_path, local_path, md5):
         """
@@ -121,7 +125,9 @@ class S3Driver(BaseDriver):
         assert md5 is None or md5 == remote_md5, \
             'Failed to check MD5 digest: local=%s, remote=%s' % (md5, remote_md5)
 
-        k.get_contents_to_filename(local_path)
+        with ProgressBar():
+            k.get_contents_to_filename(local_path)
+
         logging.info('Downloaded: %s' % local_path)
 
     def delete(self, remote_path, md5):
