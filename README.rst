@@ -87,7 +87,9 @@ Set permissions to the IAM user.
 4. Make configuration file
 --------------------------
 
-Create ``~/.artifact-cli`` file and write credentials for AWS like this.::
+Create ``~/.artifact-cli`` file and write credentials for AWS like this:
+
+.. code-block:: ini
 
     [default]
     aws_access_key_id = XXXXXXXXXXXXXXXXXXXX
@@ -101,8 +103,8 @@ Create ``~/.artifact-cli`` file and write credentials for AWS like this.::
 5. Check connection
 -------------------
 
-| Now, you are ready for using ``art`` command in the shell.  
-| Just list your artifacts.::
+Now, you are ready for using ``art`` command in the shell.  
+Just list your artifacts.::
 
     $ art list GROUP_ID
     [INFO] No artifacts.
