@@ -104,7 +104,7 @@ Create ``~/.artifact-cli`` file and write credentials for AWS like this:
 -------------------
 
 Now, you are ready for using ``art`` command in the shell.  
-Just list your artifacts.::
+Just list your artifacts::
 
     $ art list GROUP_ID
     [INFO] No artifacts.
@@ -114,13 +114,12 @@ Of course, there are no artifacts!
 6. Build the artifact
 ---------------------
 
-| Building is outside the reach of this tool.  
-| In other words, you can build as you like.
+Building is outside the reach of this tool. In other words, you can build as you like.
 
 7. Upload the artifact
 ----------------------
 
-In the builder's environment, you can upload the artifact to Amazon S3.::
+In the builder's environment, you can upload the artifact to Amazon S3::
 
     $ art upload GROUP_ID /path/to/your-artifact-0.0.1.jar
 
@@ -137,7 +136,7 @@ To view the index data, run ``art list`` or ``art info``.
 9. Download the artifact
 ------------------------
 
-Login to the deployer's environment, then download the artifact from Amazon S3.::
+Login to the deployer's environment, then download the artifact from Amazon S3::
 
     $ art download GROUP_ID /path/to/deployers/your-artifact-0.0.1.jar 1
 
@@ -159,7 +158,7 @@ For further information, type ``art -h``.
 Amazon S3 Paths
 ---------------
 
-The structure of the paths is the following.::
+The structure of the paths is the following::
 
     your-bucket-name
     ├── group.id.1                          // group ID
