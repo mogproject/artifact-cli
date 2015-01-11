@@ -144,7 +144,7 @@ To download the latest revision, use ``latest`` keyword. (case-sensitive)::
     $ art download GROUP_ID /path/to/deployers/your-artifact-0.0.1.jar latest
 
 10. Deploy
----------
+----------
 
 Deploy the artifact any way you like!
 
