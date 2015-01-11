@@ -101,8 +101,8 @@ Create ``~/.artifact-cli`` file and write credentials for AWS like this.::
 5. Check connection
 -------------------
 
-Now, you are ready for using ``art`` command in the shell.  
-Just list your artifacts.::
+| Now, you are ready for using ``art`` command in the shell.  
+| Just list your artifacts.::
 
     $ art list GROUP_ID
     [INFO] No artifacts.
@@ -112,8 +112,8 @@ Of course, there are no artifacts!
 6. Build the artifact
 ---------------------
 
-Building is outside the reach of this tool.  
-In other words, you can build as you like.
+| Building is outside the reach of this tool.  
+| In other words, you can build as you like.
 
 7. Upload the artifact
 ----------------------
@@ -124,8 +124,8 @@ In the builder's environment, you can upload the artifact to Amazon S3.::
 
 Specify group id and your local file path.
 
-Artifact ID, version and packaging(=extension) are automatically parsed from the given file name.  
-In this case, artifact ID is ``your-artifact``, version is ``0.0.1`` and packaging is ``jar``.
+| Artifact ID, version and packaging(=extension) are automatically parsed from the given file name.  
+| In this case, artifact ID is ``your-artifact``, version is ``0.0.1`` and packaging is ``jar``.
 
 8. View the artifact information
 --------------------------------
