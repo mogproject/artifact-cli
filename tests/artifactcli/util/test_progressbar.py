@@ -22,7 +22,7 @@ class TestProgressBar(unittest.TestCase):
         fp.close()
         self.assertEqual(s, '..\n')
 
-    def test_progress_bar_error(self):
+    def test_progress_bar_runtime_error(self):
         fp = StringIO()
         try:
             with ProgressBar(0.6, fp):
@@ -31,7 +31,16 @@ class TestProgressBar(unittest.TestCase):
         except RuntimeError:
             pass
 
-        time.sleep(1)
+        time.sleep(0.5)
         s = fp.getvalue()
         fp.close()
         self.assertEqual(s, '..\n')
+
+    def test_progress_bar_io_error(self):
+        fp = StringIO()
+        p = ProgressBar(0.6, fp)
+        time.sleep(1)
+        fp.close()
+        time.sleep(1)
+
+        self.assertRaises(ValueError, p.stop)
