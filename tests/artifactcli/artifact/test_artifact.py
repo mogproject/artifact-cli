@@ -103,7 +103,6 @@ class TestArtifactInfo(unittest.TestCase):
         ret = Artifact.from_path('GROUP_ID', 'tests/resources/test-artifact-1.2.3.dat')
         self.assertEqual(ret.basic_info, BasicInfo('GROUP_ID', 'test-artifact', '1.2.3', 'dat', None))
         self.assertEqual((ret.file_info.size, ret.file_info.md5), (11, '7a38cb250db7127113e00ad5e241d563'))
-        self.assertFalse(ret.scm_info is None)
 
     def test_dict_conversions(self):
         self.assertEqual(Artifact.from_dict(self.test_data[0].to_dict()), self.test_data[0])

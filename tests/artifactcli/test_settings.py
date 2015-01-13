@@ -11,10 +11,12 @@ from artifactcli.settings import Settings
 
 class TestSettings(unittest.TestCase):
     def setUp(self):
-        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'region': None, 'debug': False,
-                             'print_only': False, 'secret_key': None, 'config': '~/.artifact-cli', 'output': None}
-        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'region': None, 'debug': True,
-                          'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None}
+        self.default_opts = {'access_key': None, 'force': False, 'bucket': None, 'region': None,
+                             'log_level': logging.INFO, 'print_only': False, 'secret_key': None,
+                             'config': '~/.artifact-cli', 'output': None}
+        self.full_opts = {'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'region': None,
+                          'log_level': logging.DEBUG, 'print_only': True, 'secret_key': 'SECRET_KEY',
+                          'config': 'xxx', 'output': None}
 
     def _updated_opts(self, updates):
         d = copy(self.default_opts)
@@ -23,7 +25,6 @@ class TestSettings(unittest.TestCase):
 
     def test_parse_args_empty(self):
         self.assertEqual(Settings().parse_args(['art']), Settings())
-        self.assertEqual(Settings().log_level, logging.INFO)
 
     def test_parse_args_list(self):
         s = Settings().parse_args(['art', 'list', 'gid'])
@@ -34,7 +35,6 @@ class TestSettings(unittest.TestCase):
             ['art', 'list', 'gid', '--config', 'xxx', '--check', '--force', '--access', 'ACCESS_KEY', '--secret',
              'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
         self.assertEqual(s, Settings(operation=ListOperation('gid', []), options=self.full_opts))
-        self.assertEqual(s.log_level, logging.DEBUG)
 
     def test_parse_args_list_error(self):
         self.assertEqual(Settings().parse_args(['art', 'list']), Settings())
@@ -102,23 +102,23 @@ class TestSettings(unittest.TestCase):
         o = self._updated_opts({
             'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
             'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx',
-            'output': 'text', 'debug': True})
+            'output': 'text', 'log_level': logging.DEBUG})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', '123'], 'text'), options=o))
 
         s = Settings().parse_args(
             ['art', 'info', 'gid', 'xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
              'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--debug'])
         o = self._updated_opts({
-            'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
-            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None, 'debug': True})
+            'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'print_only': True,
+            'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': None, 'log_level': logging.DEBUG})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], None), options=o))
 
         s = Settings().parse_args(
             ['art', 'info', 'gid', 'xxx', 'latest', '--config', 'xxx', '--check', '--force', '--access',
              'ACCESS_KEY', '--secret', 'SECRET_KEY', '--bucket', 'BUCKET', '--output', 'json', '--debug'])
         o = self._updated_opts({
-            'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET',
-            'print_only': True, 'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': 'json', 'debug': True})
+            'access_key': 'ACCESS_KEY', 'force': True, 'bucket': 'BUCKET', 'print_only': True,
+            'secret_key': 'SECRET_KEY', 'config': 'xxx', 'output': 'json', 'log_level': logging.DEBUG})
         self.assertEqual(s, Settings(operation=InfoOperation('gid', ['xxx', 'latest'], 'json'), options=o))
 
     def test_parse_args_info_error(self):

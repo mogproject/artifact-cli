@@ -1,4 +1,5 @@
 from optparse import OptionParser
+import logging
 
 VERSION = 'artifact-cli %s' % __import__('artifactcli').__version__
 USAGE = """
@@ -56,7 +57,7 @@ def get_parser():
         help='Amazon S3 region name (default: us-east-1)'
     )
     parser.add_option(
-        '--debug', action='store_true', dest='debug', default=False,
-        help='enables debug level logging'
+        '--debug', action='store_const', dest='log_level', const=logging.DEBUG, default=logging.INFO,
+        help='set log level to DEBUG'
     )
     return parser

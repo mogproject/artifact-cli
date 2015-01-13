@@ -31,6 +31,8 @@ class ProgressBar(object):
         """
         self.__stop_event.set()
         self.thread.join()
+        self.fp.write('\n')
+        self.fp.flush()
 
         # check thread's exceptions
         if not self.ex_queue.empty():
@@ -56,7 +58,6 @@ class ProgressBar(object):
             self.fp.write('.')
             self.fp.flush()
             event.wait(self.interval)
-        self.fp.write('\n')
 
     def __enter__(self):
         return self

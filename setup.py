@@ -6,7 +6,7 @@ SRC_DIR = 'src'
 def get_version():
     import sys
 
-    sys.path.append(SRC_DIR)
+    sys.path[:0] = [SRC_DIR]
     return __import__('artifactcli').__version__
 
 

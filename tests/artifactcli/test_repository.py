@@ -167,7 +167,6 @@ class TestRepository(unittest.TestCase):
         ret = r.artifacts['test-artifact'][0]
         self.assertEqual(ret.basic_info, BasicInfo('com.github.mogproject', 'test-artifact', '1.2.3', 'dat', 1))
         self.assertEqual((ret.file_info.size, ret.file_info.md5), (11, '7a38cb250db7127113e00ad5e241d563'))
-        self.assertFalse(ret.scm_info is None)
 
     def test_upload_file_force(self):
         expected = [Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
