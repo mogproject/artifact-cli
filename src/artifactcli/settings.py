@@ -14,14 +14,13 @@ class Settings(CaseClass):
     """
     parser = argparser.get_parser()
 
-    def __init__(self, log_level=logging.INFO, operation=None, options=None, repo=None):
-        super(Settings, self).__init__(['log_level', 'operation', 'options', 'repo'])
+    def __init__(self, operation=None, options=None, repo=None):
+        super(Settings, self).__init__(['operation', 'options', 'repo'])
 
         # fallback operation
         operation = operation or HelpOperation(self.parser)
 
         # set parameters
-        self.log_level = logging.DEBUG if options and options['debug'] else log_level
         self.operation = operation
         self.repo = repo
         self.options = options
@@ -30,7 +29,8 @@ class Settings(CaseClass):
         """
         Setup logging settings
         """
-        logging.basicConfig(level=self.log_level, format='[%(levelname)s] %(message)s')
+        level = self.options.log_level if self.options else logging.INFO
+        logging.basicConfig(level=level, format='[%(levelname)s] %(message)s')
         return self
 
     def parse_args(self, argv):
@@ -47,19 +47,19 @@ class Settings(CaseClass):
         except AssertionError:
             return self
 
-        return Settings(self.log_level, operation, opt_dict, self.repo)
+        return Settings(operation, opt_dict, self.repo)
 
     def load_config(self):
         """
         Load configuration file and set repo
         """
         if self.options is None:
-            return Settings(self.log_level)
+            return Settings()
 
         group_id = self.operation.group_id
         if not group_id:
             logging.error('Failed to load config: group id is not set in operation')
-            return Settings(self.log_level)
+            return Settings()
 
         access_key = self.options['access_key']
         secret_key = self.options['secret_key']
@@ -80,7 +80,7 @@ class Settings(CaseClass):
                     region = r if region is None else region
             except IOError:
                 logging.error('Failed to open configuration file: %s' % config)
-                return Settings(self.log_level)
+                return Settings()
 
         for x, arg, opt in [
             (access_key, 'access_key', '--access'),
@@ -90,12 +90,12 @@ class Settings(CaseClass):
             if x is None:
                 logging.error('Oops! "%s" setting is missing.' % arg)
                 logging.error('Use "%s" option or write configuration file: %s' % (opt, config))
-                return Settings(self.log_level)
+                return Settings()
 
         # set repository driver
         driver = S3Driver(access_key, secret_key, bucket, group_id, region)
         repo = Repository(driver, group_id)
-        return Settings(self.log_level, self.operation, self.options, repo)
+        return Settings(self.operation, self.options, repo)
 
     @classmethod
     def _read_aws_config(cls, fp, group_id):
