@@ -29,4 +29,3 @@ class TestUploadOperation(unittest.TestCase):
         ret = r.artifacts['test-artifact'][1]
         self.assertEqual(ret.basic_info, BasicInfo('com.github.mogproject', 'test-artifact', '1.2.3', 'dat', 2))
         self.assertEqual((ret.file_info.size, ret.file_info.md5), (11, '7a38cb250db7127113e00ad5e241d563'))
-        self.assertFalse(ret.scm_info is None)
