@@ -91,6 +91,22 @@ class TestArtifactInfo(unittest.TestCase):
         ])
         self.assertEqual(str(self.test_data[1]), expected.encode('utf-8'))
 
+    def test_str_no_scm_info(self):
+        expected = '\n'.join([
+            'Basic Info:',
+            '  Group ID   : com.github.mogproject',
+            '  Artifact ID: xxx-yyy-assembly',
+            '  Version    : 0.1-SNAPSHOT',
+            '  Packaging  : jar',
+            '  Revision   : None',
+            'File Info:',
+            '  User    : USER@HOST',
+            '  Modified: 2014-12-31 12:34:56',
+            '  Size    : 0 (0.0B)',
+            '  MD5     : 0',
+        ])
+        self.assertEqual(str(self.test_data[2]), expected.encode('utf-8'))
+
     def test_repr(self):
         self.assertEqual(
             repr(self.test_data[0]),
