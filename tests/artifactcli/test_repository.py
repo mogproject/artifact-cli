@@ -610,7 +610,7 @@ class TestRepository(unittest.TestCase):
         fp = StringIO()
         r.print_list(output='json', fp=fp)
         arts = [Artifact.from_dict(d) for d in json.loads(fp.getvalue())]
-        self.assertEqual(arts, [
+        a = [
             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', i),
                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
                               'ffffeeeeddddccccbbbbaaaa99998888'),
@@ -618,15 +618,17 @@ class TestRepository(unittest.TestCase):
                              datetime(2014, 12, 30, 8, 11, 29), 'first commit',
                              '111122223333444455556666777788889999aaaa'))
             for i in range(1, 16)
-        ] + [
-                             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
-                                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
-                                               'ffffeeeeddddccccbbbbaaaa99998888'),
-                                      GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
-                                              datetime(2014, 12, 30, 8, 11, 29), 'new version',
-                                              '111122223333444455556666777788889999aaaa'))
-                             for i in range(1, 16)
-                         ])
+        ]
+        b = [
+            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
+                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                              'ffffeeeeddddccccbbbbaaaa99998888'),
+                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                             '111122223333444455556666777788889999aaaa'))
+            for i in range(1, 16)
+        ]
+        self.assertEqual(arts, a + b)
         fp.close()
 
     def test_print_list_output_error(self):
