@@ -42,5 +42,4 @@ class TestProgressBar(unittest.TestCase):
         time.sleep(1)
         fp.close()
         time.sleep(1)
-
         self.assertRaises(ValueError, p.stop)

@@ -1,6 +1,5 @@
 import sys
 import threading
-from Queue import Queue
 
 
 class ProgressBar(object):
@@ -16,13 +15,12 @@ class ProgressBar(object):
         """
         self.interval = interval
         self.fp = fp
-        self.ex_queue = Queue()  # store all exceptions raised in thread
 
         # create event for handling termination
         self.__stop_event = threading.Event()
 
         # create and start new thread
-        self.thread = threading.Thread(target=lambda: self.__capture_exceptions(self.__target))
+        self.thread = threading.Thread(target=self.__target)
         self.thread.start()
 
     def stop(self):
@@ -33,20 +31,6 @@ class ProgressBar(object):
         self.thread.join()
         self.fp.write('\n')
         self.fp.flush()
-
-        # check thread's exceptions
-        if not self.ex_queue.empty():
-            raise self.ex_queue.get_nowait()
-
-    def __capture_exceptions(self, f):
-        """
-        Wrapper function to capture all exceptions which are raised in the thread
-        """
-        try:
-            f()
-        except Exception as e:
-            self.ex_queue.put(e)
-            raise e
 
     def __target(self):
         """
