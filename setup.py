@@ -10,12 +10,6 @@ def get_version():
     return __import__('artifactcli').__version__
 
 
-def get_requirements(path):
-    import os
-
-    with open(path) as f:
-        return f.read().splitlines()
-
 setup(
     name='artifact-cli',
     version=get_version(),
@@ -23,8 +17,15 @@ setup(
     author='mogproject',
     author_email='mogproj@gmail.com',
     url='https://github.com/mogproject/artifact-cli',
-    install_requires=get_requirements('requirements.txt'),
-    tests_require=get_requirements('test-requirements.txt'),
+    install_requires=[
+        'pytz',
+        'python-dateutil',
+        'GitPython>=0.3.5',
+        'boto',
+    ],
+    tests_require=[
+        'moto',
+    ],
     package_dir={'': SRC_DIR},
     packages=find_packages(SRC_DIR),
     include_package_data=True,
