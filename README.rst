@@ -44,7 +44,7 @@ Dependencies
 * Python >= 2.6
 * pytz
 * python-dateutil
-* GitPython
+* GitPython >= 0.3.5
 * boto
 * moto (for testing)
 
