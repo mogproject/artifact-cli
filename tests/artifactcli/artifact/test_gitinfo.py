@@ -63,6 +63,7 @@ class TestGitInfo(unittest.TestCase):
 
     def test_from_path(self):
         gi = GitInfo.from_path('tests/resources/test-artifact-1.2.3.dat')
+        self.assertFalse(gi is None)
 
     def test_from_path_error(self):
         self.assertEqual(GitInfo.from_path('tests/resources/test001_no_such_path.dat'), None)

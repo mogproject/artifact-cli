@@ -167,6 +167,7 @@ class TestRepository(unittest.TestCase):
         ret = r.artifacts['test-artifact'][0]
         self.assertEqual(ret.basic_info, BasicInfo('com.github.mogproject', 'test-artifact', '1.2.3', 'dat', 1))
         self.assertEqual((ret.file_info.size, ret.file_info.md5), (11, '7a38cb250db7127113e00ad5e241d563'))
+        self.assertFalse(ret.scm_info is None)
 
     def test_upload_file_force(self):
         expected = [Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.1', 'jar', 1),
@@ -618,14 +619,14 @@ class TestRepository(unittest.TestCase):
                              '111122223333444455556666777788889999aaaa'))
             for i in range(1, 16)
         ] + [
-            Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
-                     FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
-                              'ffffeeeeddddccccbbbbaaaa99998888'),
-                     GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
-                             datetime(2014, 12, 30, 8, 11, 29), 'new version',
-                             '111122223333444455556666777788889999aaaa'))
-            for i in range(1, 16)
-        ])
+                             Artifact(BasicInfo('com.github.mogproject', 'art-test', '0.0.2', 'jar', i),
+                                      FileInfo('host1', 'user1', 4567890, datetime(2014, 12, 31, 9, 12, 34),
+                                               'ffffeeeeddddccccbbbbaaaa99998888'),
+                                      GitInfo('master', ['release 0.0.2'], 'mogproject', 'x@example.com',
+                                              datetime(2014, 12, 30, 8, 11, 29), 'new version',
+                                              '111122223333444455556666777788889999aaaa'))
+                             for i in range(1, 16)
+                         ])
         fp.close()
 
     def test_print_list_output_error(self):
