@@ -22,14 +22,14 @@ class Settings(CaseClass):
 
         # set parameters
         self.operation = operation
-        self.repo = repo
         self.options = options
+        self.repo = repo
 
     def configure_logging(self):
         """
         Setup logging settings
         """
-        level = self.options.log_level if self.options else logging.INFO
+        level = self.options['log_level'] if self.options else logging.INFO
         logging.basicConfig(level=level, format='[%(levelname)s] %(message)s')
         return self
 
