@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 import logging
+import os
 import dateutil.parser
 import git
 from baseinfo import BaseInfo
@@ -58,10 +59,22 @@ class GitInfo(BaseInfo):
         )
 
     @staticmethod
+    def _search_git_repo(path):
+        while True:
+            try:
+                return git.Repo(path)
+            except git.InvalidGitRepositoryError:
+                parent_dir = os.path.dirname(path)
+                if path == parent_dir:
+                    return None
+                path = parent_dir
+            except git.NoSuchPathError:
+                return None
+
+    @staticmethod
     def from_path(path):
-        try:
-            repo = git.Repo(path)
-        except (git.InvalidGitRepositoryError, git.NoSuchPathError):
+        repo = GitInfo._search_git_repo(path)
+        if not repo:
             logging.warn('Failed to fetch Git information: %s' % path)
             return None
 
