@@ -21,7 +21,7 @@ setup(
         'pytz',
         'python-dateutil',
         'GitPython>=0.3.5',
-        'boto',
+        'boto>=2.38.0',
     ],
     tests_require=[
         'moto',
