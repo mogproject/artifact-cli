@@ -97,8 +97,33 @@ Create ``~/.artifact-cli`` file and write credentials for AWS like this:
     bucket = your-bucket-name
     region = your-region (e.g. ap-northeast-1, us-east-1)
 
-| Or you can use command line options instead of the configuration file.  
-| (``--access ACCESS_KEY --secret SECRET_KEY --bucket BUCKET_NAME --region REGION``)
+You can override these settings by specifying command line options or environment variables.
+
+* Command Line Options (will override the settings from environment variables)
+
++----------------------+-------------------------------------+
+| Option               | Description                         |
++======================+=====================================+
+| --access ACCESS_KEY  | AWS access key.                     |
++----------------------+-------------------------------------+
+| --secret SECRET_KEY  | AWS secret key.                     |
++----------------------+-------------------------------------+
+| --bucket BUCKET_NAME | S3 bucket name.                     |
++----------------------+-------------------------------------+
+| --region REGION      | Region name of the S3 bucket.       |
++----------------------+-------------------------------------+
+
+* Environment Variables
+
++----------------------+-------------------------------------+
+| Variable Name        | Description                         |
++======================+=====================================+
+| AWS_ACCESS_KEY_ID    | AWS access key.                     |
++----------------------+-------------------------------------+
+| AWS_SECRET_ACCESS_KEY| AWS secret key.                     |
++----------------------+-------------------------------------+
+| AWS_DEFAULT_REGION   | Region name of the S3 bucket.       |
++----------------------+-------------------------------------+
 
 5. Check connection
 -------------------

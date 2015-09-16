@@ -168,6 +168,51 @@ class TestSettings(unittest.TestCase):
         else:
             self.fail('SystemExit exception expected')
 
+    def test_load_env_none(self):
+        ret = Settings().load_environ({})
+        self.assertEqual(ret, Settings(options={'access_key': None, 'secret_key': None, 'region': None}))
+
+    def test_load_env_set_from_env(self):
+        ret = Settings().load_environ({
+            'AWS_ACCESS_KEY_ID': 'AKIAIOSFODNN7EXAMPLE',
+            'AWS_SECRET_ACCESS_KEY': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+            'AWS_DEFAULT_REGION': 'us-west-2'
+        })
+        exp = {
+            'access_key': 'AKIAIOSFODNN7EXAMPLE',
+            'secret_key': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+            'region': 'us-west-2'
+        }
+        self.assertEqual(ret, Settings(options=exp))
+
+    def test_load_env_already_set(self):
+        opt = {'access_key': 'ACCESS_KEY', 'secret_key': 'SECRET_KEY', 'region': "us-east-1"}
+        env = {
+            'AWS_ACCESS_KEY_ID': 'AKIAIOSFODNN7EXAMPLE',
+            'AWS_SECRET_ACCESS_KEY': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+        }
+        exp = {
+            'access_key': 'ACCESS_KEY',
+            'secret_key': 'SECRET_KEY',
+            'region': 'us-east-1'
+        }
+        ret = Settings(options=opt).load_environ(env)
+        self.assertEqual(ret, Settings(options=exp))
+
+    def test_load_env_mixed(self):
+        opt = {'access_key': 'ACCESS_KEY', 'region': "us-east-1"}
+        env = {
+            'AWS_ACCESS_KEY_ID': 'AKIAIOSFODNN7EXAMPLE',
+            'AWS_SECRET_ACCESS_KEY': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+        }
+        exp = {
+            'access_key': 'ACCESS_KEY',
+            'secret_key': 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+            'region': 'us-east-1'
+        }
+        ret = Settings(options=opt).load_environ(env)
+        self.assertEqual(ret, Settings(options=exp))
+
     def test_load_config_none(self):
         ret = Settings().load_config()
         self.assertEqual(ret, Settings())

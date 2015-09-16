@@ -202,10 +202,10 @@ class Repository(CaseClass):
 
     @classmethod
     def _match_artifact(cls, artifact, artifact_id=None, version=None, packaging=None, revision=None):
-        return ((artifact_id is None or artifact.basic_info.artifact_id == artifact_id)
-                and (version is None or artifact.basic_info.version == version)
-                and (packaging is None or artifact.basic_info.packaging == packaging)
-                and (revision is None or artifact.basic_info.revision == revision))
+        return ((artifact_id is None or artifact.basic_info.artifact_id == artifact_id) and
+                (version is None or artifact.basic_info.version == version) and
+                (packaging is None or artifact.basic_info.packaging == packaging) and
+                (revision is None or artifact.basic_info.revision == revision))
 
     def _get_artifacts(self, artifact_id=None, version=None, packaging=None, revision=None):
         return [
