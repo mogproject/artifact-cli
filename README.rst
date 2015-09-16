@@ -41,29 +41,32 @@ Features
 Dependencies
 ------------
 
-* Python >= 2.6
+* Python 2.6 / 2.7
 * pytz
 * python-dateutil
 * GitPython >= 0.3.5
-* boto
+* boto >= 2.38.0
 * moto (for testing)
 
 ------------
 Installation
 ------------
 
-Just install via pip! (may need ``sudo`` command)::
+* ``pip`` command may need ``sudo``
 
-    pip install artifact-cli
-
----------
-Upgrading
----------
-
-::
-
-    pip install --upgrade artifact-cli
-    art --version
++-------------------------+------------------------------------------+
+| Operation               | Command                                  |
++=========================+==========================================+
+| Install                 |``pip install artifact-cli``              |
++-------------------------+------------------------------------------+
+| Upgrade                 |``pip install --upgrade artifact-cli``    |
++-------------------------+------------------------------------------+
+| Uninstall               |``pip uninstall artifact-cli``            |
++-------------------------+------------------------------------------+
+| Check installed version |``artifact-cli --version``                |
++-------------------------+------------------------------------------+
+| Help                    |``artifact-cli -h``                       |
++-------------------------+------------------------------------------+
 
 ----------------
 Quickstart Guide
@@ -101,29 +104,29 @@ You can override these settings by specifying command line options or environmen
 
 * Command Line Options (will override the settings from environment variables)
 
-+----------------------+-------------------------------------+
-| Option               | Description                         |
-+======================+=====================================+
-| --access ACCESS_KEY  | AWS access key.                     |
-+----------------------+-------------------------------------+
-| --secret SECRET_KEY  | AWS secret key.                     |
-+----------------------+-------------------------------------+
-| --bucket BUCKET_NAME | S3 bucket name.                     |
-+----------------------+-------------------------------------+
-| --region REGION      | Region name of the S3 bucket.       |
-+----------------------+-------------------------------------+
++--------------------------+-------------------------------------+
+| Option                   | Description                         |
++==========================+=====================================+
+| ``--access ACCESS_KEY``  | AWS access key.                     |
++--------------------------+-------------------------------------+
+| ``--secret SECRET_KEY``  | AWS secret key.                     |
++--------------------------+-------------------------------------+
+| ``--bucket BUCKET_NAME`` | S3 bucket name.                     |
++--------------------------+-------------------------------------+
+| ``--region REGION``      | Region name of the S3 bucket.       |
++--------------------------+-------------------------------------+
 
 * Environment Variables
 
-+----------------------+-------------------------------------+
-| Variable Name        | Description                         |
-+======================+=====================================+
-| AWS_ACCESS_KEY_ID    | AWS access key.                     |
-+----------------------+-------------------------------------+
-| AWS_SECRET_ACCESS_KEY| AWS secret key.                     |
-+----------------------+-------------------------------------+
-| AWS_DEFAULT_REGION   | Region name of the S3 bucket.       |
-+----------------------+-------------------------------------+
++---------------------------+-------------------------------------+
+| Variable Name             | Description                         |
++===========================+=====================================+
+| ``AWS_ACCESS_KEY_ID``     | AWS access key.                     |
++---------------------------+-------------------------------------+
+| ``AWS_SECRET_ACCESS_KEY`` | AWS secret key.                     |
++---------------------------+-------------------------------------+
+| ``AWS_DEFAULT_REGION``    | Region name of the S3 bucket.       |
++---------------------------+-------------------------------------+
 
 5. Check connection
 -------------------
@@ -224,15 +227,3 @@ Notes
 * This tool supports only artifact-id-level concurrency.
 
   * Simultaneous uploading of the artifacts with same artifact id could let repository broken.
-
-
---------------
-Uninstallation
---------------
-
-::
-
-    pip uninstall artifact-cli
-
-(may need ``sudo``)
-
