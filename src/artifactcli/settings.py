@@ -1,4 +1,5 @@
 import logging
+import copy
 from driver import S3Driver
 from os.path import expanduser, expandvars
 import operation as op
@@ -48,6 +49,23 @@ class Settings(CaseClass):
             return self
 
         return Settings(operation, opt_dict, self.repo)
+
+    def load_environ(self, env):
+        """
+        Load environment variables
+        """
+        keys = [
+            ('access_key', 'AWS_ACCESS_KEY_ID'),
+            ('secret_key', 'AWS_SECRET_ACCESS_KEY'),
+            ('region', 'AWS_DEFAULT_REGION'),
+        ]
+        d = {} if self.options is None else self.options.copy()
+        updates = dict([(k, env[v]) for k, v in keys if k not in d and v in env])
+        if updates:
+            d.update(updates)
+            return Settings(self.operation, d, self.repo)
+        else:
+            return self
 
     def load_config(self):
         """
