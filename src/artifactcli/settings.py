@@ -54,14 +54,18 @@ class Settings(CaseClass):
         """
         Load environment variables
         """
-        vs = [
+        keys = [
             ('access_key', 'AWS_ACCESS_KEY_ID'),
             ('secret_key', 'AWS_SECRET_ACCESS_KEY'),
             ('region', 'AWS_DEFAULT_REGION'),
         ]
         d = {} if self.options is None else self.options.copy()
-        d.update(dict([(k, (env.get(v) if d.get(k) is None else d[k])) for k, v in vs]))
-        return Settings(self.operation, d, self.repo)
+        updates = dict([(k, env[v]) for k, v in keys if k not in d and v in env])
+        if updates:
+            d.update(updates)
+            return Settings(self.operation, d, self.repo)
+        else:
+            return self
 
     def load_config(self):
         """
