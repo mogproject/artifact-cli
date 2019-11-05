@@ -41,7 +41,7 @@ Features
 Dependencies
 ------------
 
-* Python 2.6 / 2.7
+* Python 3.7+
 * pytz
 * python-dateutil
 * GitPython >= 0.3.5
