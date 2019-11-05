@@ -66,9 +66,9 @@ class S3Driver(BaseDriver):
         if k:
             s = k.get_contents_as_string(encoding='utf-8')
         else:
-            s = unicode()
+            s = str()
 
-        return assert_type(s, unicode)
+        return s
 
     def write_index(self, artifact_id, s):
         """
@@ -78,8 +78,6 @@ class S3Driver(BaseDriver):
         :param s: index json text in unicode
         :return: None
         """
-        assert_type(s, unicode)
-
         index_path = self.index_path(artifact_id)
         logging.debug('Writing index: %s' % self.s3_url(self.bucket_name, index_path))
         k = Key(self.bucket())

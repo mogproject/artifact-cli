@@ -23,32 +23,32 @@ class TestS3Driver(unittest.TestCase):
     @mock_s3
     def test_get_artifact_ids(self):
         d = self._get_driver()
-        d.write_index('test-artifact', u'')
-        d.write_index('test-artifact123', u'')
-        d.write_index('test-artifact10', u'')
-        d.write_index('test-artifact11', u'')
+        d.write_index('test-artifact', '')
+        d.write_index('test-artifact123', '')
+        d.write_index('test-artifact10', '')
+        d.write_index('test-artifact11', '')
 
         self.assertEqual(d.artifact_ids(), ['test-artifact', 'test-artifact10', 'test-artifact11', 'test-artifact123'])
 
     @mock_s3
     def test_write_index(self):
-        self._get_driver().write_index('test-artifact', u'[{json: "message"}]')
+        self._get_driver().write_index('test-artifact', '[{json: "message"}]')
 
     @mock_s3
     def test_write_index_unicode(self):
-        self._get_driver().write_index('test-artifact', u'[{json: "メッセージ"}]')
+        self._get_driver().write_index('test-artifact', '[{json: "メッセージ"}]')
 
     @mock_s3
     def test_read_index(self):
         d = self._get_driver()
-        d.write_index('test-artifact', u'[{json: "message"}]')
-        self.assertEqual(d.read_index('test-artifact'), u'[{json: "message"}]')
+        d.write_index('test-artifact', '[{json: "message"}]')
+        self.assertEqual(d.read_index('test-artifact'), '[{json: "message"}]')
 
     @mock_s3
     def test_read_index_unicode(self):
         d = self._get_driver()
-        d.write_index('test-artifact', u'[{json: "メッセージ"}]')
-        self.assertEqual(d.read_index('test-artifact'), u'[{json: "メッセージ"}]')
+        d.write_index('test-artifact', '[{json: "メッセージ"}]')
+        self.assertEqual(d.read_index('test-artifact'), '[{json: "メッセージ"}]')
 
     @mock_s3
     def test_read_index_not_found(self):

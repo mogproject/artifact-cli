@@ -32,7 +32,7 @@ class GitInfo(BaseInfo):
             '  Last Commit Summary: %s' % self.summary,
             '  Last Commit SHA    : %s' % self.sha,
         ]
-        return to_str('\n'.join(buf))
+        return '\n'.join(buf)
 
     def to_dict(self):
         return {

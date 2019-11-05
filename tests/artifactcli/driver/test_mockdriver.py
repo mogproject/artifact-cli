@@ -12,10 +12,10 @@ class TestMockDriver(unittest.TestCase):
 
     def test_get_artifact_ids(self):
         m = MockDriver()
-        m.write_index('test-artifact', u'')
-        m.write_index('test-artifact123', u'')
-        m.write_index('test-artifact10', u'')
-        m.write_index('test-artifact11', u'')
+        m.write_index('test-artifact', '')
+        m.write_index('test-artifact123', '')
+        m.write_index('test-artifact10', '')
+        m.write_index('test-artifact11', '')
 
         self.assertEqual(m.artifact_ids(), ['test-artifact', 'test-artifact10', 'test-artifact11', 'test-artifact123'])
 
@@ -26,7 +26,7 @@ class TestMockDriver(unittest.TestCase):
 
     def test_write_index(self):
         # write some index data then read it
-        s = u'index1\nindex2\nindex3'
+        s = 'index1\nindex2\nindex3'
         m = MockDriver()
         m.write_index('test-artifact', s)
         self.assertEqual(m.read_index('test-artifact'), s)

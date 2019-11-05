@@ -24,7 +24,7 @@ class BasicInfo(BaseInfo):
             '  Packaging  : %s' % self.packaging,
             '  Revision   : %s' % self.revision
         ]
-        return to_str('\n'.join(buf))
+        return '\n'.join(buf)
 
     def filename(self):
         return '%s-%s.%s' % (self.artifact_id, self.version, self.packaging)

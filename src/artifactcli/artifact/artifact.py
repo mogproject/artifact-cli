@@ -16,7 +16,7 @@ class Artifact(BaseInfo):
 
     def __str__(self):
         buf = [self.basic_info, self.file_info] + ([self.scm_info] if self.scm_info else [])
-        return to_str('\n'.join(map(str, buf)))
+        return '\n'.join(map(str, buf))
 
     def to_dict(self):
         ret = {

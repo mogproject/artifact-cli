@@ -27,7 +27,7 @@ class FileInfo(BaseInfo):
             '  Size    : %s (%s)' % (self.size, self.size_format()),
             '  MD5     : %s' % self.md5,
         ]
-        return to_str('\n'.join(buf))
+        return '\n'.join(buf)
 
     def to_dict(self):
         return {
