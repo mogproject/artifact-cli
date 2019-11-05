@@ -117,10 +117,10 @@ class Settings(CaseClass):
 
     @classmethod
     def _read_aws_config(cls, fp, group_id):
-        import ConfigParser
+        import configparser
 
-        parser = ConfigParser.SafeConfigParser()
-        parser.readfp(fp)
+        parser = configparser.ConfigParser()
+        parser.read_file(fp)
 
         # use group id as section name
         section_name = group_id if parser.has_section(group_id) else 'default'
