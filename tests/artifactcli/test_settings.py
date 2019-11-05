@@ -1,6 +1,6 @@
 import unittest
 from copy import copy
-from StringIO import StringIO
+from io import StringIO
 import logging
 
 from artifactcli.driver import *

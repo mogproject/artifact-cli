@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from basedriver import BaseDriver
+from .basedriver import BaseDriver
 from artifactcli.util import assert_type
 
 

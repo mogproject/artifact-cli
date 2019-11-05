@@ -4,7 +4,7 @@ import logging
 import os
 import dateutil.parser
 import git
-from baseinfo import BaseInfo
+from .baseinfo import BaseInfo
 from artifactcli.util import *
 
 

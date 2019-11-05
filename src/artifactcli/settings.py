@@ -1,12 +1,12 @@
 import logging
 import copy
-from driver import S3Driver
+from .driver import S3Driver
 from os.path import expanduser, expandvars
-import operation as op
-from operation import HelpOperation
-from repository import Repository
-from util import CaseClass
-import argparser
+from . import operation as op
+from .operation import HelpOperation
+from .repository import Repository
+from .util import CaseClass
+from . import argparser
 
 
 class Settings(CaseClass):

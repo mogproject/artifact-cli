@@ -3,8 +3,8 @@ import logging
 import sys
 from copy import deepcopy
 from collections import defaultdict
-from artifact import Artifact, BasicInfo
-from util import *
+from .artifact import Artifact, BasicInfo
+from .util import *
 
 
 class Repository(CaseClass):

@@ -4,7 +4,7 @@ import boto
 import boto.s3
 from boto.s3.key import Key
 from boto.s3.connection import OrdinaryCallingFormat
-from basedriver import BaseDriver
+from .basedriver import BaseDriver
 from artifactcli.util import assert_type, ProgressBar
 
 DEFAULT_REGION = 'us-east-1'

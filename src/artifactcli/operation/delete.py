@@ -1,5 +1,5 @@
 import logging
-from baseoperation import BaseOperation
+from .baseoperation import BaseOperation
 from artifactcli.artifact import BasicInfo
 
 

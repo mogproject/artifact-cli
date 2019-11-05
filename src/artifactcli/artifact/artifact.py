@@ -1,7 +1,7 @@
-from baseinfo import BaseInfo
-from basicinfo import BasicInfo
-from fileinfo import FileInfo
-from gitinfo import GitInfo
+from .baseinfo import BaseInfo
+from .basicinfo import BasicInfo
+from .fileinfo import FileInfo
+from .gitinfo import GitInfo
 from artifactcli.util import *
 
 

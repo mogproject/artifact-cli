@@ -4,7 +4,7 @@ import socket
 import getpass
 from datetime import datetime
 import dateutil.parser
-from baseinfo import BaseInfo
+from .baseinfo import BaseInfo
 from artifactcli.util import *
 
 

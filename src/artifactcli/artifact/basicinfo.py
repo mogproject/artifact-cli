@@ -1,6 +1,6 @@
 import os
 import re
-from baseinfo import BaseInfo
+from .baseinfo import BaseInfo
 from artifactcli.util import *
 
 

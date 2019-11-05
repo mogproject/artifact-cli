@@ -2,7 +2,7 @@
 
 import unittest
 from datetime import datetime
-from StringIO import StringIO
+from io import StringIO
 import json
 
 from artifactcli.artifact import *
