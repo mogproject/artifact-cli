@@ -16,10 +16,10 @@ dev-install:
 dev-uninstall:
 	$(PYTHON) setup.py develop -u
 
-pep8:
-	pep8 --max-line-length 120 --ignore E402,E731 src tests
+pycodestyle:
+	pycodestyle --max-line-length 120 --ignore E402,E731,W503,W504 src tests
 
-test: pep8
+test: pycodestyle
 	$(PYTHON) setup.py test
 
 coverage:
