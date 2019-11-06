@@ -161,8 +161,8 @@ class TestSettings(unittest.TestCase):
         try:
             Settings().parse_args(['art', '-x'])
         except SystemExit as e:
-            self.assertEquals(type(e), type(SystemExit()))
-            self.assertEquals(e.code, 2)
+            self.assertEqual(type(e), type(SystemExit()))
+            self.assertEqual(e.code, 2)
         except Exception as e:
             self.fail('unexpected exception: %s' % e)
         else:

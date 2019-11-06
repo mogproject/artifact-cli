@@ -17,7 +17,7 @@ class InfoOperation(BaseOperation):
             repo.load(BasicInfo.from_path(self.group_id, self.file_name).artifact_id)
             repo.print_info(self.file_name, revision, self.output)
         except ValueError as e:
-            logging.warn(e)
+            logging.warning(e)
             return 2
 
         return 0

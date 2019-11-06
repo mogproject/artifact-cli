@@ -69,7 +69,7 @@ class Repository(CaseClass):
         revisions = self._get_artifacts(bi.artifact_id, bi.version, bi.packaging)
         xs = [x for x in revisions if (x.file_info.size, x.file_info.md5) == (fi.size, fi.md5)]
         if xs and not force:
-            logging.warn('Already uploaded as:\n%s' % xs[0])
+            logging.warning('Already uploaded as:\n%s' % xs[0])
             return
 
         # increment revision
