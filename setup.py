@@ -19,9 +19,10 @@ setup(
     url='https://github.com/mogproject/artifact-cli',
     install_requires=[
         'pytz',
-        'python-dateutil',
+        'python-dateutil<2.8.1,>=2.1',
         'GitPython>=0.3.5',
-        'boto>=2.38.0',
+        'boto3',
+        'botocore'
     ],
     tests_require=[
         'moto',

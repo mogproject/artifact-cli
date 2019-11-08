@@ -23,7 +23,7 @@ Private Artifact Manager using Amazon S3
 
 .. image:: https://badge.waffle.io/mogproject/artifact-cli.svg?label=ready&title=Ready
    :target: https://waffle.io/mogproject/artifact-cli
-   :alt: 'Stories in Ready' 
+   :alt: 'Stories in Ready'
 
 --------
 Features
@@ -43,9 +43,10 @@ Dependencies
 
 * Python 3.7+
 * pytz
-* python-dateutil
+* python-dateutil < 2.8.1, >= 2.1
 * GitPython >= 0.3.5
-* boto >= 2.38.0
+* boto3
+  botocore
 * moto (for testing)
 
 ------------
@@ -131,7 +132,7 @@ You can override these settings by specifying command line options or environmen
 5. Check connection
 -------------------
 
-Now, you are ready for using ``art`` command in the shell.  
+Now, you are ready for using ``art`` command in the shell.
 Just list your artifacts::
 
     $ art list GROUP_ID
@@ -153,7 +154,7 @@ In the builder's environment, you can upload the artifact to Amazon S3::
 
 Specify group id and your local file path.
 
-| Artifact ID, version and packaging(=extension) are automatically parsed from the given file name.  
+| Artifact ID, version and packaging(=extension) are automatically parsed from the given file name.
 | In this case, artifact ID is ``your-artifact``, version is ``0.0.1`` and packaging is ``jar``.
 
 8. View the artifact information
@@ -214,7 +215,7 @@ The structure of the paths is the following::
     |               └── play-project-0.0.1.zip
     └── group.id.2
         ├── .meta
-        │   └── index-awesome-project.json 
+        │   └── index-awesome-project.json
         └── awesome-project                 // completely separated to the group.id.1's artifact
             └── 0.0.1
                 └── 1
