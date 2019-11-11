@@ -21,39 +21,38 @@ Private Artifact Manager using Amazon S3
    :target: http://choosealicense.com/licenses/apache-2.0/
    :alt: License
 
-.. image:: https://badge.waffle.io/mogproject/artifact-cli.svg?label=ready&title=Ready
-   :target: https://waffle.io/mogproject/artifact-cli
-   :alt: 'Stories in Ready'
-
 --------
 Features
 --------
 
 * Easy & lightweight artifact manager for Java/Scala
 
-  * Especially optimized for all-in-one package (e.g. the result of ``sbt dist`` or ``sbt assembly``)
+  * Optimized for all-in-one packages (e.g., the product of ``sbt dist`` or ``sbt assembly``)
 
-* No database or extra servers needed except Amazon S3
-* Quite simple command line interface (CLI)
-* Integrate your daily build & deploy tasks
+* No database or extra servers needed other than Amazon S3
+* Simple command-line interface (CLI)
+* Integrates your daily build & deploy tasks
 
 ------------
 Dependencies
 ------------
 
 * Python 3.7+
+
+  * Python 2 support was dropped with Version 0.1.11.
+  
 * pytz
 * python-dateutil < 2.8.1, >= 2.1
 * GitPython >= 0.3.5
 * boto3
-  botocore
+* botocore
 * moto (for testing)
 
 ------------
 Installation
 ------------
 
-* ``pip`` command may need ``sudo``
+* ``pip`` command may require ``sudo``
 
 +-------------------------+------------------------------------------+
 | Operation               | Command                                  |
@@ -73,25 +72,25 @@ Installation
 Quickstart Guide
 ----------------
 
-1. Create your Amazon Web Services account (if need)
-----------------------------------------------------
+1. Create your Amazon Web Services account (if needed)
+------------------------------------------------------
 
-The responsibility of the AWS's charge is your own.
+The charge on your AWS account is your responsibility.
 
-2. Create IAM User to access Amazon S3 (if need)
-------------------------------------------------
+2. Create IAM User to access Amazon S3 (if needed)
+--------------------------------------------------
 
 Manage your own **access key ID** and **secret access key** to call the APIs.
 
 3. Create Amazon S3 bucket
 --------------------------
 
-Set permissions to the IAM user.
+Add permissions to the IAM user.
 
 4. Make configuration file
 --------------------------
 
-Create ``~/.artifact-cli`` file and write credentials for AWS like this:
+Create the file ``~/.artifact-cli`` and include credential information for AWS like this:
 
 .. code-block:: ini
 
@@ -101,9 +100,9 @@ Create ``~/.artifact-cli`` file and write credentials for AWS like this:
     bucket = your-bucket-name
     region = your-region (e.g. ap-northeast-1, us-east-1)
 
-You can override these settings by specifying command line options or environment variables.
+You may override those settings by command-line options and/or environment variables.
 
-* Command Line Options (will override the settings from environment variables)
+* Command-line Options (will override the settings from environment variables)
 
 +--------------------------+-------------------------------------+
 | Option                   | Description                         |
@@ -132,18 +131,18 @@ You can override these settings by specifying command line options or environmen
 5. Check connection
 -------------------
 
-Now, you are ready for using ``art`` command in the shell.
-Just list your artifacts::
+Now, you are ready for the ``art`` command.
+Let's try to list your artifacts::
 
     $ art list GROUP_ID
     [INFO] No artifacts.
 
-Of course, there are no artifacts!
+You'll see, there are no artifacts!
 
 6. Build the artifact
 ---------------------
 
-Building is outside the reach of this tool. In other words, you can build as you like.
+Build is something outside of this tool. In other words, you can build as you like.
 
 7. Upload the artifact
 ----------------------
@@ -154,7 +153,7 @@ In the builder's environment, you can upload the artifact to Amazon S3::
 
 Specify group id and your local file path.
 
-| Artifact ID, version and packaging(=extension) are automatically parsed from the given file name.
+| Artifact ID, version, and packaging(=extension) are automatically parsed from the given file name.
 | In this case, artifact ID is ``your-artifact``, version is ``0.0.1`` and packaging is ``jar``.
 
 8. View the artifact information
@@ -176,7 +175,7 @@ To download the latest revision, use ``latest`` keyword. (case-sensitive)::
 10. Deploy
 ----------
 
-Deploy the artifact any way you like!
+Deploy the artifact in any way you like!
 
 11. And then ...
 ----------------
@@ -227,4 +226,5 @@ Notes
 
 * This tool supports only artifact-id-level concurrency.
 
-  * Simultaneous uploading of the artifacts with same artifact id could let repository broken.
+  * Simultaneous uploading of the artifacts with the same artifact id may break your repository.
+
