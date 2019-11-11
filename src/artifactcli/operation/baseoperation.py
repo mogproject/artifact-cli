@@ -8,7 +8,7 @@ class BaseOperation(CaseClass):
 
     def __init__(self, group_id=None, args=None, optional_params=None):
         optional_params = optional_params or {}
-        super(BaseOperation, self).__init__(['group_id', 'args'] + optional_params.keys())
+        super(BaseOperation, self).__init__(['group_id', 'args'] + list(optional_params.keys()))
 
         self.group_id = group_id
         self.args = args

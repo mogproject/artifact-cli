@@ -1,5 +1,5 @@
 import unittest
-from StringIO import StringIO
+from io import StringIO
 import time
 from artifactcli.util.progressbar import ProgressBar
 

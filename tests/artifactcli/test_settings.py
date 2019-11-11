@@ -1,6 +1,6 @@
 import unittest
 from copy import copy
-from StringIO import StringIO
+from io import StringIO
 import logging
 
 from artifactcli.driver import *
@@ -160,10 +160,10 @@ class TestSettings(unittest.TestCase):
     def test_parse_args_unknown_option(self):
         try:
             Settings().parse_args(['art', '-x'])
-        except SystemExit, e:
-            self.assertEquals(type(e), type(SystemExit()))
-            self.assertEquals(e.code, 2)
-        except Exception, e:
+        except SystemExit as e:
+            self.assertEqual(type(e), type(SystemExit()))
+            self.assertEqual(e.code, 2)
+        except Exception as e:
             self.fail('unexpected exception: %s' % e)
         else:
             self.fail('SystemExit exception expected')

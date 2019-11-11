@@ -3,8 +3,8 @@ import logging
 import sys
 from copy import deepcopy
 from collections import defaultdict
-from artifact import Artifact, BasicInfo
-from util import *
+from .artifact import Artifact, BasicInfo
+from .util import *
 
 
 class Repository(CaseClass):
@@ -44,7 +44,7 @@ class Repository(CaseClass):
         """
         xs = [x.to_dict() for x in self.artifacts[artifact_id]]
         s = json.dumps(xs, ensure_ascii=False)
-        self.driver.write_index(artifact_id, to_unicode(s))
+        self.driver.write_index(artifact_id, s)
 
     def upload(self, local_path, artifact=None, force=False, print_only=False):
         """
@@ -69,7 +69,7 @@ class Repository(CaseClass):
         revisions = self._get_artifacts(bi.artifact_id, bi.version, bi.packaging)
         xs = [x for x in revisions if (x.file_info.size, x.file_info.md5) == (fi.size, fi.md5)]
         if xs and not force:
-            logging.warn('Already uploaded as:\n%s' % xs[0])
+            logging.warning('Already uploaded as:\n%s' % xs[0])
             return
 
         # increment revision
@@ -164,7 +164,7 @@ class Repository(CaseClass):
             raise ValueError('Unknown output format: %s' % output)
 
         for line in buf:
-            fp.write(to_str(line) + '\n')
+            fp.write(line + '\n')
 
     def print_info(self, file_name, revision=None, output=None, fp=sys.stdout):
         output = output or 'text'
@@ -176,7 +176,7 @@ class Repository(CaseClass):
             s = json.dumps(art.to_dict(), ensure_ascii=False)
         else:
             raise ValueError('Unknown output format: %s' % output)
-        fp.write(to_str(s) + '\n')
+        fp.write(s + '\n')
 
     def _get_artifact_from_path(self, path, revision=None):
         bi = BasicInfo.from_path(self.group_id, path)

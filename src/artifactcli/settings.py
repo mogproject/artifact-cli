@@ -1,12 +1,12 @@
 import logging
 import copy
-from driver import S3Driver
+from .driver import S3Driver
 from os.path import expanduser, expandvars
-import operation as op
-from operation import HelpOperation
-from repository import Repository
-from util import CaseClass
-import argparser
+from . import operation as op
+from .operation import HelpOperation
+from .repository import Repository
+from .util import CaseClass
+from . import argparser
 
 
 class Settings(CaseClass):
@@ -117,10 +117,10 @@ class Settings(CaseClass):
 
     @classmethod
     def _read_aws_config(cls, fp, group_id):
-        import ConfigParser
+        import configparser
 
-        parser = ConfigParser.SafeConfigParser()
-        parser.readfp(fp)
+        parser = configparser.ConfigParser()
+        parser.read_file(fp)
 
         # use group id as section name
         section_name = group_id if parser.has_section(group_id) else 'default'

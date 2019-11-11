@@ -9,17 +9,17 @@ class TestArtifactInfo(unittest.TestCase):
     def setUp(self):
         self.test_bi = [
             BasicInfo('com.github.mogproject', 'xxx-yyy-assembly', '0.1-SNAPSHOT', 'jar', None),
-            BasicInfo('com.github.mogproject', 'xxx-yyy-assembly', u'0.1.2あ', 'zip', 345),
+            BasicInfo('com.github.mogproject', 'xxx-yyy-assembly', '0.1.2あ', 'zip', 345),
         ]
         self.test_fi = [
             FileInfo('HOST', 'USER', 0, datetime(2014, 12, 31, 12, 34, 56), '0'),
-            FileInfo('HOST', u'USERあ', 10000000000000000000000000000, datetime(2014, 12, 31, 12, 34, 56), 'ffff'),
+            FileInfo('HOST', 'USERあ', 10000000000000000000000000000, datetime(2014, 12, 31, 12, 34, 56), 'ffff'),
         ]
         self.test_si = [
             GitInfo('master', [], 'AUTHOR', 'x@example.com', datetime(2014, 12, 31, 12, 34, 56),
                     'COMMIT MSG', 'ffff'),
-            GitInfo('master', ['release_YYYYMMDD', 'TAG'], u'AUTHORあいう', 'y@example.com',
-                    datetime(2014, 12, 31, 12, 34, 56), u'COMMIT MSGかきく', '0123'),
+            GitInfo('master', ['release_YYYYMMDD', 'TAG'], 'AUTHORあいう', 'y@example.com',
+                    datetime(2014, 12, 31, 12, 34, 56), 'COMMIT MSGかきく', '0123'),
         ]
         self.test_data = [
             Artifact(self.test_bi[0], self.test_fi[0], self.test_si[0]),
@@ -73,23 +73,23 @@ class TestArtifactInfo(unittest.TestCase):
             'Basic Info:',
             '  Group ID   : com.github.mogproject',
             '  Artifact ID: xxx-yyy-assembly',
-            u'  Version    : 0.1.2あ',
+            '  Version    : 0.1.2あ',
             '  Packaging  : zip',
             '  Revision   : 345',
             'File Info:',
-            u'  User    : USERあ@HOST',
+            '  User    : USERあ@HOST',
             '  Modified: 2014-12-31 12:34:56',
             '  Size    : 10000000000000000000000000000 (8271.8YiB)',
             '  MD5     : ffff',
             'Git Info:',
             '  Branch             : master',
             '  Tags               : release_YYYYMMDD, TAG',
-            u'  Last Commit Author : AUTHORあいう <y@example.com>',
+            '  Last Commit Author : AUTHORあいう <y@example.com>',
             '  Last Commit Date   : 2014-12-31 12:34:56',
-            u'  Last Commit Summary: COMMIT MSGかきく',
+            '  Last Commit Summary: COMMIT MSGかきく',
             '  Last Commit SHA    : 0123',
         ])
-        self.assertEqual(str(self.test_data[1]), expected.encode('utf-8'))
+        self.assertEqual(str(self.test_data[1]), expected)
 
     def test_str_no_scm_info(self):
         expected = '\n'.join([
@@ -105,7 +105,7 @@ class TestArtifactInfo(unittest.TestCase):
             '  Size    : 0 (0.0B)',
             '  MD5     : 0',
         ])
-        self.assertEqual(str(self.test_data[2]), expected.encode('utf-8'))
+        self.assertEqual(str(self.test_data[2]), expected)
 
     def test_repr(self):
         self.assertEqual(

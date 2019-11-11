@@ -1,6 +1,6 @@
 import sys
 import os
-from settings import Settings
+from .settings import Settings
 
 
 def main():

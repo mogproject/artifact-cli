@@ -4,7 +4,7 @@ import logging
 import os
 import dateutil.parser
 import git
-from baseinfo import BaseInfo
+from .baseinfo import BaseInfo
 from artifactcli.util import *
 
 
@@ -32,7 +32,7 @@ class GitInfo(BaseInfo):
             '  Last Commit Summary: %s' % self.summary,
             '  Last Commit SHA    : %s' % self.sha,
         ]
-        return to_str('\n'.join(buf))
+        return '\n'.join(buf)
 
     def to_dict(self):
         return {
@@ -75,13 +75,13 @@ class GitInfo(BaseInfo):
     def from_path(path):
         repo = GitInfo._search_git_repo(path)
         if not repo:
-            logging.warn('Failed to fetch Git information: %s' % path)
+            logging.warning('Failed to fetch Git information: %s' % path)
             return None
 
         try:
             ref = repo.head.reference
         except TypeError:
-            logging.warn('Failed to get Git HEAD reference: %s' % path)
+            logging.warning('Failed to get Git HEAD reference: %s' % path)
             ref = repo.head
 
         branch = '' if ref.name == 'HEAD' else ref.name

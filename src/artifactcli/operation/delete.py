@@ -1,5 +1,5 @@
 import logging
-from baseoperation import BaseOperation
+from .baseoperation import BaseOperation
 from artifactcli.artifact import BasicInfo
 
 
@@ -19,7 +19,7 @@ class DeleteOperation(BaseOperation):
             repo.delete(self.file_name, revision, print_only=self.print_only)
             repo.save(artifact_id)
         except ValueError as e:
-            logging.warn(e)
+            logging.warning(e)
             return 2
 
         return 0

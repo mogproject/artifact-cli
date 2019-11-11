@@ -1,7 +1,7 @@
-from baseinfo import BaseInfo
-from basicinfo import BasicInfo
-from fileinfo import FileInfo
-from gitinfo import GitInfo
+from .baseinfo import BaseInfo
+from .basicinfo import BasicInfo
+from .fileinfo import FileInfo
+from .gitinfo import GitInfo
 from artifactcli.util import *
 
 
@@ -16,7 +16,7 @@ class Artifact(BaseInfo):
 
     def __str__(self):
         buf = [self.basic_info, self.file_info] + ([self.scm_info] if self.scm_info else [])
-        return to_str('\n'.join(map(str, buf)))
+        return '\n'.join(map(str, buf))
 
     def to_dict(self):
         ret = {
