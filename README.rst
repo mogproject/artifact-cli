@@ -21,10 +21,6 @@ Private Artifact Manager using Amazon S3
    :target: http://choosealicense.com/licenses/apache-2.0/
    :alt: License
 
-.. image:: https://badge.waffle.io/mogproject/artifact-cli.svg?label=ready&title=Ready
-   :target: https://waffle.io/mogproject/artifact-cli
-   :alt: 'Stories in Ready'
-
 --------
 Features
 --------
@@ -42,6 +38,9 @@ Dependencies
 ------------
 
 * Python 3.7+
+
+  * Use version 0.1.10 for Python 2.
+  
 * pytz
 * python-dateutil < 2.8.1, >= 2.1
 * GitPython >= 0.3.5
